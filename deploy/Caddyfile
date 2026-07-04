@@ -1,0 +1,7 @@
+# HTTPS reverse proxy — use with: docker compose --profile ssl up -d
+# Local: self-signed cert (browser will warn). Production: replace localhost with your domain.
+
+localhost {
+    reverse_proxy web:80
+    tls internal
+}

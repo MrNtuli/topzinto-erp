@@ -1,0 +1,26 @@
+.placeholder {
+  background: white;
+  border-radius: var(--radius);
+  padding: 60px 40px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  max-width: 560px;
+}
+
+.placeholder svg {
+  color: var(--color-navy);
+  opacity: 0.4;
+  margin-bottom: 20px;
+}
+
+.placeholder h2 {
+  font-size: 20px;
+  color: var(--color-navy);
+  margin-bottom: 12px;
+}
+
+.placeholder p {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}

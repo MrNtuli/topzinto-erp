@@ -1,0 +1,50 @@
+# Production overlay — use with base compose:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
+#
+# Requires deploy/Caddyfile configured for your domain (see deploy/Caddyfile.production).
+
+services:
+  postgres:
+    ports: []
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  redis:
+    ports: []
+
+  minio:
+    ports: []
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+
+  api:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=topzinto_erp;Username=topzinto;Password=${POSTGRES_PASSWORD}"
+      Jwt__Key: ${JWT_KEY}
+      FileStorage__Minio__AccessKey: ${MINIO_ROOT_USER}
+      FileStorage__Minio__SecretKey: ${MINIO_ROOT_PASSWORD}
+      Cors__AllowedOrigins__0: "https://${APP_DOMAIN}"
+      App__BaseUrl: "https://${APP_DOMAIN}"
+      Email__Enabled: ${EMAIL_ENABLED:-false}
+      Email__FromAddress: ${EMAIL_FROM:-noreply@example.co.za}
+      Email__Smtp__Host: ${EMAIL_SMTP_HOST:-}
+      Email__Smtp__Port: ${EMAIL_SMTP_PORT:-587}
+      Email__Smtp__UseSsl: ${EMAIL_SMTP_SSL:-true}
+      Email__Smtp__Username: ${EMAIL_SMTP_USER:-}
+      Email__Smtp__Password: ${EMAIL_SMTP_PASSWORD:-}
+    ports: []  # API reached via nginx/Caddy only
+
+  web:
+    ports: []  # nginx internal only; Caddy is the public entry point
+
+  caddy:
+    profiles: !reset null
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config

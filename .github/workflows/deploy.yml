@@ -1,0 +1,37 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: Git branch to deploy
+        required: true
+        default: main
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+            cd "${{ secrets.DEPLOY_PATH }}"
+            git fetch origin
+            git checkout "${{ github.event.inputs.branch }}"
+            git pull origin "${{ github.event.inputs.branch }}"
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d --build
+            docker compose ps
+            echo "Waiting for API..."
+            sleep 15
+            curl -sf http://localhost/api/health | head -c 500
+            echo ""
+            echo "Deploy complete."

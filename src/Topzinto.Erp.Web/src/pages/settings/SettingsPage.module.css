@@ -1,0 +1,191 @@
+.card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+}
+
+.wide { grid-column: 1 / -1; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin-bottom: 16px;
+}
+
+.dl {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.dl dt { color: var(--color-text-muted); }
+
+.roleBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  background: var(--color-navy);
+  color: white;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-orange);
+  font-weight: 500;
+}
+
+.adminLinks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.adminLinks .link {
+  margin-top: 0;
+}
+
+.scanBtn {
+  align-self: flex-start;
+  padding: 8px 16px;
+  background: var(--color-navy);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.scanBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 12px;
+}
+
+.backupBtn {
+  padding: 10px 20px;
+  background: var(--color-orange);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.backupBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.success {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #166534;
+}
+
+.error {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #b91c1c;
+}
+
+.backupList {
+  margin-top: 12px;
+  font-size: 13px;
+  list-style: none;
+  padding: 0;
+}
+
+.backupList li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.backupList li:last-child {
+  border-bottom: none;
+}
+
+.backupList button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-orange);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.backupMeta {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.form input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--color-navy);
+}
+
+.saveBtn {
+  align-self: flex-start;
+  padding: 10px 20px;
+  background: var(--color-navy);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .formRow { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: 1fr; }
+}

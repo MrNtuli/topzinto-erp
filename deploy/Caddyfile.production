@@ -1,0 +1,11 @@
+# Production HTTPS — Caddy obtains and renews Let's Encrypt certificates automatically.
+# Replace erp.example.co.za with your real domain before deploying.
+#
+# Usage:
+#   cp deploy/Caddyfile.production deploy/Caddyfile
+#   (edit domain)
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+erp.example.co.za {
+    reverse_proxy web:80
+}

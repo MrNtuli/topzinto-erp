@@ -1,0 +1,23 @@
+.shell {
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  transition: margin-left 0.2s ease;
+}
+
+.main[data-collapsed='true'] {
+  margin-left: var(--sidebar-collapsed);
+}
+
+.content {
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: var(--sidebar-collapsed);
+  }
+}

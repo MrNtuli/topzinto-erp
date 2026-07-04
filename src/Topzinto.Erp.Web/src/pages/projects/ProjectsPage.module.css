@@ -1,0 +1,166 @@
+.page {
+  max-width: 1400px;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.newBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-orange);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.newBtn:hover {
+  background: var(--color-orange-hover);
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filters input,
+.filters select {
+  padding: 10px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: white;
+  font-size: 14px;
+}
+
+.filters input {
+  flex: 1;
+  max-width: 320px;
+}
+
+.tableWrap {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table th {
+  text-align: left;
+  padding: 14px 16px;
+  background: var(--color-bg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.name {
+  font-weight: 600;
+  color: var(--color-navy);
+}
+
+.value {
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.completed {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.progressBar {
+  flex: 1;
+  height: 8px;
+  background: var(--color-border);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 80px;
+}
+
+.progressBar div {
+  height: 100%;
+  background: var(--color-orange);
+  border-radius: 4px;
+}
+
+.action {
+  color: var(--color-text-muted);
+  padding: 4px;
+  display: inline-flex;
+}
+
+.loading,
+.hint {
+  padding: 16px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-orange);
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.linkBtn:hover {
+  color: var(--color-orange-hover);
+}
+
+.action:hover {
+  color: var(--color-navy);
+}

@@ -1,0 +1,102 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: topzinto-postgres
+    environment:
+      POSTGRES_DB: topzinto_erp
+      POSTGRES_USER: topzinto
+      POSTGRES_PASSWORD: topzinto_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U topzinto -d topzinto_erp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: topzinto-redis
+    ports:
+      - "6379:6379"
+
+  minio:
+    image: minio/minio:latest
+    container_name: topzinto-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: topzinto
+      MINIO_ROOT_PASSWORD: topzinto_dev
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: topzinto-api
+    expose:
+      - "8080"
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      UseSqlite: "false"
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=topzinto_erp;Username=topzinto;Password=topzinto_dev"
+      FileStorage__Provider: Minio
+      FileStorage__Minio__Endpoint: minio:9000
+      FileStorage__Minio__AccessKey: topzinto
+      FileStorage__Minio__SecretKey: topzinto_dev
+      FileStorage__Minio__Bucket: topzinto-documents
+      FileStorage__Minio__UseSsl: "false"
+      Backup__Enabled: "true"
+      Backup__IntervalHours: "24"
+      Backup__RetentionCount: "7"
+      ConnectionStrings__Redis: "redis:6379"
+      Redis__Enabled: "true"
+      Redis__DefaultMinutes: "5"
+      Jwt__Key: "TopZinto-ERP-Super-Secret-Key-Min-32-Chars-2024!"
+      Jwt__Issuer: Topzinto.Erp
+      Jwt__Audience: Topzinto.Erp.Web
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    container_name: topzinto-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: topzinto-caddy
+    profiles:
+      - ssl
+    ports:
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  minio_data:
+  caddy_data:
+  caddy_config:

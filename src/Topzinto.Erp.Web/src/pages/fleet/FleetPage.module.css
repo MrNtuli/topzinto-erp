@@ -1,0 +1,39 @@
+.kpiRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi {
+  background: white;
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.kpi span {
+  display: block;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-navy);
+}
+
+.kpi label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.green { color: var(--color-success) !important; }
+.orange { color: var(--color-orange) !important; }
+.yellow { color: var(--color-warning) !important; }
+.red { color: var(--color-danger) !important; }
+
+.expiring { background: #fff7ed; }
+.maintBadge { background: #fef3c7; color: #b45309; }
+
+@media (max-width: 900px) {
+  .kpiRow { grid-template-columns: repeat(2, 1fr); }
+}

@@ -1,0 +1,46 @@
+# Build
+bin/
+obj/
+dist/
+node_modules/
+coverage/
+TestResults/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.DotSettings.user
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+appsettings.*.local.json
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# App data (local dev)
+postgres_data/
+minio_data/
+redis_data/
+topzinto_erp.db
+topzinto_erp_test.db
+topzinto_erp.db-*
+**/backups/
+uploads/
+uploads_test/
+src/Topzinto.Erp.Api/uploads/
+src/Topzinto.Erp.Api/uploads_test/
+
+# Frontend cache
+*.tsbuildinfo
+.vite/
