@@ -242,6 +242,7 @@ export function SettingsPage() {
             <p className={localStyles.note}>Director-only tools for managing the platform.</p>
             <div className={localStyles.adminLinks}>
               <Link to="/admin/users" className={localStyles.link}>Manage Users</Link>
+              <Link to="/admin/roles" className={localStyles.link}>Roles &amp; Permissions</Link>
               <Link to="/admin/audit" className={localStyles.link}>Full Audit Log</Link>
               <button
                 type="button"

@@ -37,6 +37,7 @@ import { AddEmployeePage } from '@/pages/employees/AddEmployeePage'
 import { EditEmployeePage } from '@/pages/employees/EditEmployeePage'
 import { AuditLogsPage } from '@/pages/admin/AuditLogsPage'
 import { UsersPage } from '@/pages/admin/UsersPage'
+import { RolesPage } from '@/pages/admin/RolesPage'
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage'
 import { AddDocumentPage } from '@/pages/documents/AddDocumentPage'
 import { AddClientPage } from '@/pages/clients/AddClientPage'
@@ -161,6 +162,7 @@ export default function App() {
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/admin/audit" element={<AuditLogsPage />} />
                 <Route path="/admin/users" element={<UsersPage />} />
+                <Route path="/admin/roles" element={<RolesPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
               </RoleRoute>

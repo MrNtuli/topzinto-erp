@@ -398,6 +398,14 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **RBAC** — BOQ module policy (QuantitySurveyor, Estimator, Finance, ContractManager, ProjectManager, OperationsManager, Directors)
 - [x] **Integration tests** — `BoqClaimsUpdateTests.cs` (BOQ amount recalc + claim title update)
 
+### v2.43 — Admin Roles UI
+- [x] **API** — `GET /api/admin/roles` and `GET /api/admin/roles/matrix` (Director/SuperAdmin only)
+- [x] **API client** — `getRoleMatrix` in `src/api/admin.ts`
+- [x] **Roles page** — `/admin/roles` lists system roles with user counts and read-only module permission matrix
+- [x] **Role detail** — per-role module access grid, assigned users list, loading/empty/error states
+- [x] **Navigation** — Settings → Administration link; route guard via `roleAccess.ts`
+- [x] **RBAC** — Director and SuperAdmin only (matches existing admin endpoints)
+
 ### v2.44 — Safety MVP
 - [x] **SafetyIncident entity** — project-linked incidents with severity/status enums
 - [x] **Migration** — `AddSafetyIncidents`

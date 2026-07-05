@@ -1,0 +1,183 @@
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.panel {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panelHeader {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.panelHeader h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin: 0;
+}
+
+.panelHeader p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.roleRow {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.roleRow:hover {
+  background: #f8fafc;
+}
+
+.roleRowSelected {
+  background: #fff7ed !important;
+}
+
+.roleRowSelected td:first-child {
+  box-shadow: inset 3px 0 0 var(--color-orange);
+}
+
+.countBadge {
+  display: inline-block;
+  min-width: 28px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #e2e8f0;
+  color: var(--color-navy);
+  text-align: center;
+}
+
+.countZero {
+  background: #f1f5f9;
+  color: var(--color-text-muted);
+}
+
+.matrixTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.matrixTable th,
+.matrixTable td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.matrixTable th {
+  text-align: left;
+  background: var(--color-bg);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.accessYes,
+.accessNo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.accessYes {
+  color: #166534;
+}
+
+.accessNo {
+  color: #94a3b8;
+}
+
+.detailEmpty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.userList {
+  margin-top: 16px;
+  padding: 0 20px 20px;
+}
+
+.userList h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-navy);
+  margin-bottom: 8px;
+}
+
+.userList ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.userList li {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-navy);
+}
+
+.userList li span {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.note {
+  padding: 12px 20px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  background: #fafafa;
+}
+
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .matrixTable thead {
+    display: none;
+  }
+
+  .matrixTable tr {
+    display: block;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .matrixTable td {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border: none;
+  }
+
+  .matrixTable td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+}

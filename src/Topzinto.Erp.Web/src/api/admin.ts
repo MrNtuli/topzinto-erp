@@ -42,6 +42,11 @@ export interface RoleOption {
   label: string
 }
 
+export interface RoleMatrix {
+  roles: RoleOption[]
+  matrix: Record<string, string[]>
+}
+
 export interface CreateUserRequest {
   email: string
   firstName: string
@@ -87,6 +92,10 @@ export function getUsers() {
 
 export function getRoles() {
   return apiFetch<RoleOption[]>('/admin/roles')
+}
+
+export function getRoleMatrix() {
+  return apiFetch<RoleMatrix>('/admin/roles/matrix')
 }
 
 export function createUser(data: CreateUserRequest) {
