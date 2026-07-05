@@ -22,6 +22,7 @@ import {
   Settings,
   ChevronLeft,
   ShieldAlert,
+  ShieldCheck,
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuthStore } from '@/stores/authStore'
@@ -38,6 +39,7 @@ const navItems = [
   { to: '/boq', icon: Calculator, label: 'BOQ & Costing' },
   { to: '/site-reports', icon: ClipboardList, label: 'Site Reports' },
   { to: '/safety', icon: ShieldAlert, label: 'Safety' },
+  { to: '/compliance', icon: ShieldCheck, label: 'Compliance' },
   { to: '/schedule', icon: Calendar, label: 'Schedule' },
   { to: '/fleet', icon: Truck, label: 'Fleet' },
   { to: '/equipment', icon: Wrench, label: 'Equipment' },

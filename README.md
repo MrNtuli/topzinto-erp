@@ -415,13 +415,14 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Edit** — `/safety/:id/edit` form
 - [x] **Navigation** — Safety sidebar link; route guard via `roleAccess.ts` (Safety Officer + Directors)
 
-### v2.45 — Compliance MVP
-- [x] **ComplianceRecord entity** — certificates, licences, permits with expiry tracking
-- [x] **Migration** — `AddComplianceRecords`
-- [x] **API** — `ComplianceController` CRUD with `IComplianceService` / `ComplianceService`
-- [x] **RBAC** — `ErpModules.Compliance` module matrix
-- [x] **Integration tests** — `ComplianceRecordTests.cs`
-- [x] **Health version** — bumped to `2.45`
+### v2.45 — Compliance Records CRUD UI
+- [x] **Backend** — `ComplianceRecord` entity, migration, `ComplianceController` CRUD, `ComplianceService`, integration tests
+- [x] **API client** — `src/api/compliance.ts` (list, get, create, update, soft delete)
+- [x] **List page** — `/compliance` with search, project/status filters, client-side pagination, type/status/expiry badges, mobile cards
+- [x] **Create** — `/compliance/new` record form
+- [x] **Detail** — `/compliance/:id` with edit and soft-delete actions
+- [x] **Edit** — `/compliance/:id/edit` form
+- [x] **Navigation** — Compliance sidebar link; route guard via `roleAccess.ts` (Safety Officer, HR, Ops/Project Managers + Directors)
 
 ---
 
