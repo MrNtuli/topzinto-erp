@@ -9,4 +9,5 @@ public interface IFleetService
     Task<VehicleDetailDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<VehicleDetailDto> CreateAsync(CreateVehicleRequest request, Guid? userId, CancellationToken ct = default);
     Task<VehicleDetailDto?> UpdateAsync(Guid id, UpdateVehicleRequest request, Guid? userId, CancellationToken ct = default);
+    Task<FuelLogDto?> CreateFuelLogAsync(Guid vehicleId, CreateFuelLogRequest request, Guid? userId, CancellationToken ct = default);
 }

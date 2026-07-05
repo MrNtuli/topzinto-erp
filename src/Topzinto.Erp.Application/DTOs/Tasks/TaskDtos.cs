@@ -51,3 +51,31 @@ public record ScheduleEventDto(
     string? ProjectName,
     string Status
 );
+
+public record GanttTaskDto(
+    Guid Id,
+    Guid ProjectId,
+    string ProjectName,
+    string Title,
+    string? StartDate,
+    string? EndDate,
+    string Status,
+    string Priority,
+    Guid? MilestoneId
+);
+
+public record GanttMilestoneDto(
+    Guid Id,
+    Guid ProjectId,
+    string ProjectName,
+    string Name,
+    string? StartDate,
+    string EndDate,
+    string Status,
+    int Progress
+);
+
+public record GanttDataDto(
+    IReadOnlyList<GanttTaskDto> Tasks,
+    IReadOnlyList<GanttMilestoneDto> Milestones
+);

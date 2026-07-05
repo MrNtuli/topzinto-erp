@@ -79,4 +79,8 @@ public class ScheduleController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetEvents([FromQuery] DateTime? from, [FromQuery] DateTime? to, CancellationToken ct) =>
         Ok(await _service.GetEventsAsync(from, to, ct));
+
+    [HttpGet("gantt")]
+    public async Task<IActionResult> GetGantt([FromQuery] Guid? projectId, CancellationToken ct) =>
+        Ok(await _service.GetGanttDataAsync(projectId, ct));
 }

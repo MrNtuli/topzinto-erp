@@ -191,6 +191,55 @@ public class ScheduleService : IScheduleService
         return events.OrderBy(e => e.Date).ToList();
     }
 
+    public async Task<GanttDataDto> GetGanttDataAsync(Guid? projectId = null, CancellationToken ct = default)
+    {
+        var taskQuery = _db.ProjectTasks.Include(t => t.Project).AsQueryable();
+        var milestoneQuery = _db.ProjectMilestones.Include(m => m.Project).AsQueryable();
+
+        if (projectId.HasValue)
+        {
+            taskQuery = taskQuery.Where(t => t.ProjectId == projectId.Value);
+            milestoneQuery = milestoneQuery.Where(m => m.ProjectId == projectId.Value);
+        }
+
+        var taskEntities = await taskQuery.OrderBy(t => t.DueDate).ToListAsync(ct);
+        var milestoneEntities = await milestoneQuery.OrderBy(m => m.SortOrder).ToListAsync(ct);
+
+        var tasks = taskEntities.Select(t => new GanttTaskDto(
+            t.Id,
+            t.ProjectId,
+            t.Project.Name,
+            t.Title,
+            t.CreatedAt.ToString("yyyy-MM-dd"),
+            t.DueDate?.ToString("yyyy-MM-dd"),
+            FormatProjectTaskStatus(t.Status),
+            t.Priority.ToString(),
+            t.MilestoneId
+        )).ToList();
+
+        var milestones = milestoneEntities.Select(m => new GanttMilestoneDto(
+            m.Id,
+            m.ProjectId,
+            m.Project.Name,
+            m.Name,
+            m.StartDate?.ToString("yyyy-MM-dd"),
+            m.DueDate.ToString("yyyy-MM-dd"),
+            FormatMilestoneStatus(m.Status),
+            m.Progress
+        )).ToList();
+
+        return new GanttDataDto(tasks, milestones);
+    }
+
+    private static string FormatProjectTaskStatus(ProjectTaskStatus s) => s switch
+    {
+        ProjectTaskStatus.NotStarted => "Not Started",
+        ProjectTaskStatus.InProgress => "In Progress",
+        ProjectTaskStatus.Completed => "Completed",
+        ProjectTaskStatus.Overdue => "Overdue",
+        _ => s.ToString(),
+    };
+
     private static string FormatMilestoneStatus(MilestoneStatus s) => s switch
     {
         MilestoneStatus.InProgress => "In Progress",

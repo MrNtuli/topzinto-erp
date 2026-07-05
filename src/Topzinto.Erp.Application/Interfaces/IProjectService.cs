@@ -9,4 +9,5 @@ public interface IProjectService
     Task<ProjectDetailDto> CreateAsync(CreateProjectRequest request, Guid? userId, CancellationToken ct = default);
     Task<ProjectDetailDto?> UpdateAsync(Guid id, UpdateProjectRequest request, Guid? userId, CancellationToken ct = default);
     Task<bool> DeleteAsync(Guid id, Guid? userId, CancellationToken ct = default);
+    Task<IReadOnlyList<ActivityItemDto>?> GetActivityAsync(Guid projectId, CancellationToken ct = default);
 }

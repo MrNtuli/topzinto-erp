@@ -59,3 +59,14 @@ public record UpdateProjectRequest(
     string? Description,
     string? SiteLocation
 );
+
+public record ActivityItemDto(
+    Guid Id,
+    string Action,
+    string Module,
+    string EntityType,
+    string EntityId,
+    string UserEmail,
+    DateTime CreatedAt,
+    string Summary
+);

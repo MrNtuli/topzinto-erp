@@ -45,6 +45,12 @@ public class BoqService : IBoqService
         )).ToList();
     }
 
+    public async Task<BoqItemDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var item = await _db.BoqItems.Include(i => i.Project).FirstOrDefaultAsync(i => i.Id == id, ct);
+        return item is null ? null : MapItem(item);
+    }
+
     public async Task<BoqItemDto> CreateAsync(CreateBoqItemRequest request, Guid? userId, CancellationToken ct = default)
     {
         var amount = request.Quantity * request.Rate;
@@ -64,8 +70,33 @@ public class BoqService : IBoqService
         _db.BoqItems.Add(item);
         await _db.SaveChangesAsync(ct);
         await _audit.LogAsync(userId, "", "Create", "Financial", "BoqItem", item.Id.ToString(), newValues: item.ItemCode, ct: ct);
-        return (await GetAllAsync(item.ProjectId, null, ct)).First(i => i.Id == item.Id);
+        return (await GetByIdAsync(item.Id, ct))!;
     }
+
+    public async Task<BoqItemDto?> UpdateAsync(Guid id, UpdateBoqItemRequest request, Guid? userId, CancellationToken ct = default)
+    {
+        var item = await _db.BoqItems.FindAsync([id], ct);
+        if (item is null) return null;
+
+        item.ItemCode = request.ItemCode.Trim();
+        item.Description = request.Description.Trim();
+        item.Category = request.Category.Trim();
+        item.Unit = request.Unit.Trim();
+        item.Quantity = request.Quantity;
+        item.Rate = request.Rate;
+        item.Amount = request.Quantity * request.Rate;
+        item.Notes = request.Notes?.Trim();
+        item.UpdatedAt = DateTime.UtcNow;
+        item.UpdatedBy = userId;
+        await _db.SaveChangesAsync(ct);
+        await _audit.LogAsync(userId, "", "Update", "Financial", "BoqItem", item.Id.ToString(), newValues: item.ItemCode, ct: ct);
+        return await GetByIdAsync(id, ct);
+    }
+
+    private static BoqItemDto MapItem(BoqItem i) => new(
+        i.Id, i.ItemCode, i.Description, i.Category, i.Unit,
+        i.Quantity, i.Rate, i.Amount, i.ProjectId, i.Project.Name
+    );
 }
 
 public class ClaimsService : IClaimsService
@@ -100,6 +131,12 @@ public class ClaimsService : IClaimsService
         )).ToList();
     }
 
+    public async Task<ClaimDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var claim = await _db.Claims.Include(c => c.Project).FirstOrDefaultAsync(c => c.Id == id, ct);
+        return claim is null ? null : MapClaim(claim);
+    }
+
     public async Task<ClaimDto> CreateAsync(CreateClaimRequest request, Guid? userId, CancellationToken ct = default)
     {
         var claim = new Claim
@@ -119,9 +156,37 @@ public class ClaimsService : IClaimsService
         _db.Claims.Add(claim);
         await _db.SaveChangesAsync(ct);
         await _audit.LogAsync(userId, "", "Create", "Financial", "Claim", claim.Id.ToString(), newValues: claim.ClaimNumber, ct: ct);
-        var list = await GetAllAsync(claim.ProjectId, null, ct);
-        return list.First(c => c.Id == claim.Id);
+        return (await GetByIdAsync(claim.Id, ct))!;
     }
+
+    public async Task<ClaimDto?> UpdateAsync(Guid id, UpdateClaimRequest request, Guid? userId, CancellationToken ct = default)
+    {
+        var claim = await _db.Claims.FindAsync([id], ct);
+        if (claim is null) return null;
+
+        claim.ClaimNumber = request.ClaimNumber.Trim();
+        claim.Title = request.Title.Trim();
+        claim.ClaimDate = FinancialDisplay.ParseDateTime(request.ClaimDate) ?? claim.ClaimDate;
+        claim.PeriodFrom = FinancialDisplay.ParseDateTime(request.PeriodFrom);
+        claim.PeriodTo = FinancialDisplay.ParseDateTime(request.PeriodTo);
+        claim.Amount = request.Amount;
+        claim.Status = FinancialDisplay.ParseClaimStatus(request.Status);
+        claim.SubmittedByName = request.SubmittedByName?.Trim();
+        claim.Notes = request.Notes?.Trim();
+        claim.UpdatedAt = DateTime.UtcNow;
+        claim.UpdatedBy = userId;
+        await _db.SaveChangesAsync(ct);
+        await _audit.LogAsync(userId, "", "Update", "Financial", "Claim", claim.Id.ToString(), newValues: claim.ClaimNumber, ct: ct);
+        return await GetByIdAsync(id, ct);
+    }
+
+    private static ClaimDto MapClaim(Claim c) => new(
+        c.Id, c.ClaimNumber, c.Title, c.Project.Name,
+        FinancialDisplay.FormatClaimStatus(c.Status), c.Amount,
+        FinancialDisplay.FormatDate(c.ClaimDate),
+        FinancialDisplay.FormatDate(c.PeriodFrom),
+        FinancialDisplay.FormatDate(c.PeriodTo)
+    );
 }
 
 public class InvoiceService : IInvoiceService

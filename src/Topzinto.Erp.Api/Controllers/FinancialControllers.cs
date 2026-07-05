@@ -33,11 +33,25 @@ public class BoqController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] Guid? projectId, [FromQuery] string? search, CancellationToken ct) =>
         Ok(await _boq.GetAllAsync(projectId, search, ct));
 
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var result = await _boq.GetByIdAsync(id, ct);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateBoqItemRequest request, CancellationToken ct)
     {
         var result = await _boq.CreateAsync(request, GetUserId(), ct);
         return CreatedAtAction(nameof(GetAll), new { projectId = result.ProjectId }, result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateBoqItemRequest request, CancellationToken ct)
+    {
+        var result = await _boq.UpdateAsync(id, request, GetUserId(), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     private Guid? GetUserId() =>
@@ -57,11 +71,25 @@ public class ClaimsController : ControllerBase
     public async Task<IActionResult> GetAll([FromQuery] Guid? projectId, [FromQuery] string? status, CancellationToken ct) =>
         Ok(await _service.GetAllAsync(projectId, status, ct));
 
+    [HttpGet("{id:guid}")]
+    public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
+    {
+        var result = await _service.GetByIdAsync(id, ct);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateClaimRequest request, CancellationToken ct)
     {
         var result = await _service.CreateAsync(request, GetUserId(), ct);
         return CreatedAtAction(nameof(GetAll), new { projectId = result.ProjectName }, result);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateClaimRequest request, CancellationToken ct)
+    {
+        var result = await _service.UpdateAsync(id, request, GetUserId(), ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     private Guid? GetUserId() =>

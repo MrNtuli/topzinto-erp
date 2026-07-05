@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Topzinto.Erp.Application.DTOs.Projects;
 using Topzinto.Erp.Application.Interfaces;
 using Topzinto.Erp.Domain.Entities;
+using Topzinto.Erp.Domain.Enums;
 using Topzinto.Erp.Infrastructure.Common;
 using Topzinto.Erp.Infrastructure.Persistence;
 
@@ -120,6 +121,57 @@ public class ProjectService : IProjectService
         project.UpdatedBy = userId;
         await _db.SaveChangesAsync(ct);
         return true;
+    }
+
+    public async Task<IReadOnlyList<ActivityItemDto>?> GetActivityAsync(Guid projectId, CancellationToken ct = default)
+    {
+        if (!await _db.Projects.AnyAsync(p => p.Id == projectId, ct))
+            return null;
+
+        var projectIdStr = projectId.ToString();
+        var taskIds = await _db.ProjectTasks.Where(t => t.ProjectId == projectId).Select(t => t.Id.ToString()).ToListAsync(ct);
+        var milestoneIds = await _db.ProjectMilestones.Where(m => m.ProjectId == projectId).Select(m => m.Id.ToString()).ToListAsync(ct);
+        var siteReportIds = await _db.SiteReports.Where(s => s.ProjectId == projectId).Select(s => s.Id.ToString()).ToListAsync(ct);
+        var boqIds = await _db.BoqItems.Where(b => b.ProjectId == projectId).Select(b => b.Id.ToString()).ToListAsync(ct);
+        var claimIds = await _db.Claims.Where(c => c.ProjectId == projectId).Select(c => c.Id.ToString()).ToListAsync(ct);
+        var documentIds = await _db.Documents
+            .Where(d => d.ParentType == DocumentParentType.Project && d.ParentId == projectId)
+            .Select(d => d.Id.ToString())
+            .ToListAsync(ct);
+
+        var logs = await _db.AuditLogs
+            .Where(a =>
+                (a.EntityType == "Project" && a.EntityId == projectIdStr) ||
+                (a.EntityType == "ProjectTask" && taskIds.Contains(a.EntityId)) ||
+                (a.EntityType == "ProjectMilestone" && milestoneIds.Contains(a.EntityId)) ||
+                (a.EntityType == "SiteReport" && siteReportIds.Contains(a.EntityId)) ||
+                (a.EntityType == "BoqItem" && boqIds.Contains(a.EntityId)) ||
+                (a.EntityType == "Claim" && claimIds.Contains(a.EntityId)) ||
+                ((a.EntityType == "DocumentRecord" || a.EntityType == "Document") && documentIds.Contains(a.EntityId)))
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(100)
+            .ToListAsync(ct);
+
+        return logs.Select(MapActivity).ToList();
+    }
+
+    private static ActivityItemDto MapActivity(AuditLog log)
+    {
+        var detail = log.NewValues ?? log.OldValues;
+        var summary = string.IsNullOrWhiteSpace(detail)
+            ? $"{log.Action} {log.EntityType}"
+            : $"{log.Action} {log.EntityType}: {detail}";
+
+        return new ActivityItemDto(
+            log.Id,
+            log.Action,
+            log.Module,
+            log.EntityType,
+            log.EntityId,
+            log.UserEmail,
+            log.CreatedAt,
+            summary
+        );
     }
 
     private static ProjectDetailDto MapDetail(Project p) => new(

@@ -18,4 +18,5 @@ public interface IProjectMilestoneService
 public interface IScheduleService
 {
     Task<IReadOnlyList<ScheduleEventDto>> GetEventsAsync(DateTime? from = null, DateTime? to = null, CancellationToken ct = default);
+    Task<GanttDataDto> GetGanttDataAsync(Guid? projectId = null, CancellationToken ct = default);
 }

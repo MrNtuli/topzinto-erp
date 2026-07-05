@@ -69,3 +69,12 @@ public record UpdateVehicleRequest(
     Guid? AssignedProjectId,
     string? Notes
 );
+
+public record CreateFuelLogRequest(
+    DateTime LogDate,
+    decimal Litres,
+    decimal Cost,
+    decimal? OdometerReading,
+    Guid? ProjectId,
+    string? Notes
+);

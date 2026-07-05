@@ -87,6 +87,15 @@ public static class ModuleRoleMatrix
                 SystemRoles.Receptionist, SystemRoles.ContractManager, SystemRoles.OperationsManager,
                 SystemRoles.ProjectManager, SystemRoles.Estimator,
             ],
+            [ErpModules.Safety] =
+            [
+                SystemRoles.SafetyOfficer,
+            ],
+            [ErpModules.Compliance] =
+            [
+                SystemRoles.SafetyOfficer, SystemRoles.HR, SystemRoles.OperationsManager,
+                SystemRoles.ProjectManager,
+            ],
         };
 
     public static bool CanAccess(string module, IEnumerable<string> userRoles)
@@ -105,4 +114,10 @@ public static class ModuleRoleMatrix
 
         return roles.Any(r => allowed.Contains(r, StringComparer.OrdinalIgnoreCase));
     }
+
+    public static IReadOnlyDictionary<string, string[]> BuildAccessMatrix() =>
+        ErpModules.All.ToDictionary(
+            m => m,
+            m => SystemRoles.All.Where(r => CanAccess(m, [r])).ToArray(),
+            StringComparer.OrdinalIgnoreCase);
 }

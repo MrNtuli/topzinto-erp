@@ -46,6 +46,13 @@ public class FleetController : ControllerBase
         return result is null ? NotFound() : Ok(result);
     }
 
+    [HttpPost("{id:guid}/fuel-logs")]
+    public async Task<IActionResult> CreateFuelLog(Guid id, [FromBody] CreateFuelLogRequest request, CancellationToken ct)
+    {
+        var result = await _service.CreateFuelLogAsync(id, request, GetUserId(), ct);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     private Guid? GetUserId() =>
         Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : null;
 }

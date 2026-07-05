@@ -22,6 +22,6 @@ public class HealthEndpointTests : IClassFixture<ErpWebApplicationFactory>
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal("healthy", json.GetProperty("status").GetString());
-        Assert.Equal("2.35", json.GetProperty("version").GetString());
+        Assert.Equal("2.45", json.GetProperty("version").GetString());
     }
 }

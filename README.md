@@ -331,7 +331,7 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Audit trail** — password changes logged with IP and user agent
 - [x] **UI** — Settings → **Change Password** (current, new, confirm) with loading/success/error states
 - [x] **Integration tests** — success, wrong current password, and weak new password coverage
-- [ ] **Future** — invalidate other active sessions after password change (JWT stateless; planned refresh-token/session store)
+- [x] **Session invalidation** — other sessions signed out via refresh-token revocation (v2.36)
 
 ### v2.35 — My Profile (User Account Page)
 - [x] **API** — `GET /api/users/me` and `PATCH /api/users/me` (requires JWT)
@@ -341,6 +341,54 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **UI** — `/profile` page with loading/success/error states; link from top bar user menu
 - [x] **Settings** — password change remains in Settings; profile editing moved to My Profile
 - [x] **Integration tests** — get profile, update profile, email/role cannot be changed via API
+
+### v2.36 — Refresh Tokens & Session Invalidation
+- [x] **Refresh tokens** — login returns `accessToken` + `refreshToken`; hashed server-side with rotation on refresh
+- [x] **Refresh endpoint** — `POST /api/auth/refresh` issues new token pair; old refresh token revoked
+- [x] **Logout** — `POST /api/auth/logout` revokes refresh token (or all sessions when no token supplied)
+- [x] **Session invalidation** — password change and reset revoke all refresh tokens and bump security stamp
+- [x] **JWT validation** — access tokens include security stamp claim; invalidated tokens rejected immediately
+- [x] **Frontend** — auth store persists refresh token; API client auto-refreshes on 401
+- [x] **Integration tests** — refresh flow, invalid token, and post-password-change token rejection
+
+### v2.37 — MFA / Two-Factor Authentication (TOTP)
+- [x] **Setup** — `POST /api/auth/mfa/setup` returns shared key + authenticator URI (QR-ready)
+- [x] **Enable / disable** — verify TOTP code via ASP.NET Identity authenticator; audit logged
+- [x] **Login flow** — password login returns MFA challenge when enabled; `POST /api/auth/mfa/verify` completes sign-in
+- [x] **Settings UI** — Settings → 2FA card with QR setup, manual key, enable/disable
+- [x] **Integration tests** — MFA status, setup endpoint, unauthorized access
+
+### v2.38 — SMTP Admin UI
+- [x] **Database-backed SMTP** — `CompanySetting` stores host, port, credentials (password hashed server-side; never returned)
+- [x] **Admin API** — `GET/PUT /api/admin/email-settings`, `POST /api/admin/email/test` (Director/SuperAdmin)
+- [x] **Runtime resolution** — `EmailService` prefers DB settings over appsettings when configured
+- [x] **Settings UI** — Director-only Email / SMTP card with save and send test email
+- [x] **Integration tests** — `EmailSettingsTests.cs`
+
+### v2.39 — Project Activity Feed
+- [x] **Activity endpoint** — `GET /api/projects/{id}/activity` returns audit-based `ActivityItemDto` list
+- [x] **Cross-entity scope** — Project, tasks, milestones, site reports, BOQ, claims and documents
+- [x] **Integration tests** — `ProjectActivityTests.cs`
+
+### v2.40 — Schedule Gantt Data
+- [x] **Gantt endpoint** — `GET /api/schedule/gantt?projectId=` returns `GanttDataDto` with tasks and milestones
+- [x] **Schedule service** — `ScheduleService.GetGanttDataAsync` with optional project filter
+- [x] **Integration tests** — `GanttDataTests.cs` smoke test
+
+### v2.44 — Safety MVP
+- [x] **SafetyIncident entity** — project-linked incidents with severity/status enums
+- [x] **Migration** — `AddSafetyIncidents`
+- [x] **API** — `SafetyController` CRUD with `ISafetyService` / `SafetyService`
+- [x] **RBAC** — `ErpModules.Safety` for Safety Officer and Directors
+- [x] **Integration tests** — `SafetyIncidentTests.cs`
+
+### v2.45 — Compliance MVP
+- [x] **ComplianceRecord entity** — certificates, licences, permits with expiry tracking
+- [x] **Migration** — `AddComplianceRecords`
+- [x] **API** — `ComplianceController` CRUD with `IComplianceService` / `ComplianceService`
+- [x] **RBAC** — `ErpModules.Compliance` module matrix
+- [x] **Integration tests** — `ComplianceRecordTests.cs`
+- [x] **Health version** — bumped to `2.45`
 
 ---
 

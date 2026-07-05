@@ -50,6 +50,11 @@ public record UserAdminDto(
 
 public record RoleOptionDto(string Value, string Label);
 
+public record RoleMatrixDto(
+    IReadOnlyList<RoleOptionDto> Roles,
+    IReadOnlyDictionary<string, string[]> Matrix
+);
+
 
 
 public record CreateUserRequest(

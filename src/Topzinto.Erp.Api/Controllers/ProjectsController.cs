@@ -52,6 +52,13 @@ public class ProjectsController : ControllerBase
         return ok ? NoContent() : NotFound();
     }
 
+    [HttpGet("{id:guid}/activity")]
+    public async Task<IActionResult> GetActivity(Guid id, CancellationToken ct)
+    {
+        var result = await _service.GetActivityAsync(id, ct);
+        return result is null ? NotFound() : Ok(result);
+    }
+
     private Guid? GetUserId()
     {
         var id = User.FindFirstValue(ClaimTypes.NameIdentifier);

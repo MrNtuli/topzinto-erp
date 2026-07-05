@@ -70,6 +70,34 @@ public class FleetService : IFleetService
         return (await GetByIdAsync(vehicle.Id, ct))!;
     }
 
+    public async Task<FuelLogDto?> CreateFuelLogAsync(Guid vehicleId, CreateFuelLogRequest request, Guid? userId, CancellationToken ct = default)
+    {
+        var vehicle = await _db.Vehicles.FindAsync([vehicleId], ct);
+        if (vehicle is null) return null;
+
+        var log = new FuelLog
+        {
+            VehicleId = vehicleId,
+            LogDate = request.LogDate.Date,
+            Litres = request.Litres,
+            Cost = request.Cost,
+            OdometerReading = request.OdometerReading,
+            ProjectId = request.ProjectId,
+            Notes = request.Notes?.Trim(),
+            CreatedBy = userId,
+        };
+        _db.FuelLogs.Add(log);
+        await _db.SaveChangesAsync(ct);
+        await _audit.LogAsync(userId, "", "Create", "Fleet", "FuelLog", log.Id.ToString(), newValues: vehicle.RegistrationNumber, ct: ct);
+        return new FuelLogDto(
+            log.Id,
+            log.LogDate.ToString("dd MMM yyyy"),
+            log.Litres,
+            log.Cost,
+            log.OdometerReading,
+            log.Notes);
+    }
+
     public async Task<VehicleDetailDto?> UpdateAsync(Guid id, UpdateVehicleRequest request, Guid? userId, CancellationToken ct = default)
     {
         var vehicle = await _db.Vehicles.FindAsync([id], ct);

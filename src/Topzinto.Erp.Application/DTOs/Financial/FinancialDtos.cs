@@ -26,6 +26,16 @@ public record CreateBoqItemRequest(
     string? Notes
 );
 
+public record UpdateBoqItemRequest(
+    string ItemCode,
+    string Description,
+    string Category,
+    string Unit,
+    decimal Quantity,
+    decimal Rate,
+    string? Notes
+);
+
 public record ClaimDto(
     Guid Id,
     string ClaimNumber,
@@ -40,6 +50,18 @@ public record ClaimDto(
 
 public record CreateClaimRequest(
     Guid ProjectId,
+    string ClaimNumber,
+    string Title,
+    string ClaimDate,
+    string? PeriodFrom,
+    string? PeriodTo,
+    decimal Amount,
+    string Status,
+    string? SubmittedByName,
+    string? Notes
+);
+
+public record UpdateClaimRequest(
     string ClaimNumber,
     string Title,
     string ClaimDate,
