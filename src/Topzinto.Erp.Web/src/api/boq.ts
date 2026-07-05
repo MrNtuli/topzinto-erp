@@ -27,6 +27,7 @@ export interface BoqItem {
   amount: number
   projectId: string
   projectName: string
+  notes?: string
 }
 
 export interface Claim {
@@ -39,6 +40,8 @@ export interface Claim {
   claimDate: string
   periodFrom: string | null
   periodTo: string | null
+  submittedByName?: string
+  notes?: string
 }
 
 export interface Invoice {
@@ -110,6 +113,46 @@ export function createClaim(data: {
   notes?: string
 }) {
   return apiFetch<Claim>('/claims', { method: 'POST', body: JSON.stringify(data) })
+}
+
+export function getBoqItem(id: string) {
+  return apiFetch<BoqItem>(`/boq/${id}`)
+}
+
+export function updateBoqItem(
+  id: string,
+  data: {
+    itemCode: string
+    description: string
+    category: string
+    unit: string
+    quantity: number
+    rate: number
+    notes?: string
+  },
+) {
+  return apiFetch<BoqItem>(`/boq/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+}
+
+export function getClaim(id: string) {
+  return apiFetch<Claim>(`/claims/${id}`)
+}
+
+export function updateClaim(
+  id: string,
+  data: {
+    claimNumber: string
+    title: string
+    claimDate: string
+    periodFrom?: string
+    periodTo?: string
+    amount: number
+    status: string
+    submittedByName?: string
+    notes?: string
+  },
+) {
+  return apiFetch<Claim>(`/claims/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
 export { formatCurrency }

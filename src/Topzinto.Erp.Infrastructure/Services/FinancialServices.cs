@@ -39,10 +39,7 @@ public class BoqService : IBoqService
             query = query.Where(i => i.Description.Contains(search) || i.ItemCode.Contains(search) || i.Category.Contains(search));
 
         var list = await query.OrderBy(i => i.ItemCode).ToListAsync(ct);
-        return list.Select(i => new BoqItemDto(
-            i.Id, i.ItemCode, i.Description, i.Category, i.Unit,
-            i.Quantity, i.Rate, i.Amount, i.ProjectId, i.Project.Name
-        )).ToList();
+        return list.Select(MapItem).ToList();
     }
 
     public async Task<BoqItemDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -95,7 +92,7 @@ public class BoqService : IBoqService
 
     private static BoqItemDto MapItem(BoqItem i) => new(
         i.Id, i.ItemCode, i.Description, i.Category, i.Unit,
-        i.Quantity, i.Rate, i.Amount, i.ProjectId, i.Project.Name
+        i.Quantity, i.Rate, i.Amount, i.ProjectId, i.Project.Name, i.Notes
     );
 }
 
@@ -122,13 +119,7 @@ public class ClaimsService : IClaimsService
         }
 
         var list = await query.OrderByDescending(c => c.ClaimDate).ToListAsync(ct);
-        return list.Select(c => new ClaimDto(
-            c.Id, c.ClaimNumber, c.Title, c.Project.Name,
-            FinancialDisplay.FormatClaimStatus(c.Status), c.Amount,
-            FinancialDisplay.FormatDate(c.ClaimDate),
-            FinancialDisplay.FormatDate(c.PeriodFrom),
-            FinancialDisplay.FormatDate(c.PeriodTo)
-        )).ToList();
+        return list.Select(MapClaim).ToList();
     }
 
     public async Task<ClaimDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -185,7 +176,8 @@ public class ClaimsService : IClaimsService
         FinancialDisplay.FormatClaimStatus(c.Status), c.Amount,
         FinancialDisplay.FormatDate(c.ClaimDate),
         FinancialDisplay.FormatDate(c.PeriodFrom),
-        FinancialDisplay.FormatDate(c.PeriodTo)
+        FinancialDisplay.FormatDate(c.PeriodTo),
+        c.SubmittedByName, c.Notes
     );
 }
 

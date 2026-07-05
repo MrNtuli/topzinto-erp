@@ -12,7 +12,8 @@ public record BoqItemDto(
     decimal Rate,
     decimal Amount,
     Guid ProjectId,
-    string ProjectName
+    string ProjectName,
+    string? Notes
 );
 
 public record CreateBoqItemRequest(
@@ -45,7 +46,9 @@ public record ClaimDto(
     decimal Amount,
     string ClaimDate,
     string? PeriodFrom,
-    string? PeriodTo
+    string? PeriodTo,
+    string? SubmittedByName,
+    string? Notes
 );
 
 public record CreateClaimRequest(

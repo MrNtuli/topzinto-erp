@@ -86,7 +86,9 @@ export function BoqPage() {
               <tbody>
                 {boqItems?.map((item) => (
                   <tr key={item.id}>
-                    <td className={styles.name}>{item.itemCode}</td>
+                    <td className={styles.name}>
+                      <Link to={`/boq/${item.id}/edit`}>{item.itemCode}</Link>
+                    </td>
                     <td>{item.description}</td>
                     <td>{item.projectName}</td>
                     <td>{item.category}</td>
@@ -116,7 +118,9 @@ export function BoqPage() {
             <tbody>
               {claims?.map((c) => (
                 <tr key={c.id}>
-                  <td className={styles.name}>{c.claimNumber}</td>
+                  <td className={styles.name}>
+                    <Link to={`/boq/claims/${c.id}/edit`}>{c.claimNumber}</Link>
+                  </td>
                   <td>{c.title}</td>
                   <td>{c.projectName}</td>
                   <td><span className={`${styles.badge} ${c.status === 'Paid' ? styles.completed : styles.active}`}>{c.status}</span></td>

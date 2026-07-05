@@ -389,6 +389,15 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **RBAC** — Fleet module policy (`FleetManager`, `EquipmentManager`, `OperationsManager`, `ProjectManager`, Directors)
 - [x] **Integration tests** — `FuelLogFlowTests.cs` (create success + vehicle not found)
 
+### v2.42 — Edit BOQ Items + Claims
+- [x] **Backend** — `PUT /api/boq/{id}` and `PUT /api/claims/{id}` (amount recalculated for BOQ; audit logged)
+- [x] **DTO enrichment** — `BoqItemDto.Notes`, `ClaimDto.Notes` + `SubmittedByName` for edit prefill
+- [x] **API clients** — `getBoqItem`, `updateBoqItem`, `getClaim`, `updateClaim` in `src/api/boq.ts`
+- [x] **Edit forms** — `/boq/:id/edit` and `/boq/claims/:id/edit` with validation, loading, success and error states
+- [x] **Navigation** — edit links from BOQ page tables and project BOQ / Financial tabs
+- [x] **RBAC** — BOQ module policy (QuantitySurveyor, Estimator, Finance, ContractManager, ProjectManager, OperationsManager, Directors)
+- [x] **Integration tests** — `BoqClaimsUpdateTests.cs` (BOQ amount recalc + claim title update)
+
 ### v2.44 — Safety MVP
 - [x] **SafetyIncident entity** — project-linked incidents with severity/status enums
 - [x] **Migration** — `AddSafetyIncidents`

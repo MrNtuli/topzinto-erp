@@ -199,7 +199,9 @@ export function ProjectDetailPage() {
             <tbody>
               {boqItems?.map((item) => (
                 <tr key={item.id}>
-                  <td className={tableStyles.name}>{item.itemCode}</td>
+                  <td className={tableStyles.name}>
+                    <Link to={`/boq/${item.id}/edit`}>{item.itemCode}</Link>
+                  </td>
                   <td>{item.description}</td>
                   <td>{item.category}</td>
                   <td>{item.quantity} {item.unit}</td>
@@ -252,7 +254,9 @@ export function ProjectDetailPage() {
                 <tbody>
                   {claims?.map((c) => (
                     <tr key={c.id}>
-                      <td>{c.claimNumber}</td>
+                      <td>
+                        <Link to={`/boq/claims/${c.id}/edit`}>{c.claimNumber}</Link>
+                      </td>
                       <td>{c.title}</td>
                       <td>{c.status}</td>
                       <td className={tableStyles.value}>{fmtBoq(c.amount)}</td>

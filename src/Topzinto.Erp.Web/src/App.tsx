@@ -70,6 +70,8 @@ import { TimesheetsPage } from '@/pages/timesheets/TimesheetsPage'
 import { AddTimesheetPage } from '@/pages/timesheets/AddTimesheetPage'
 import { AddBoqItemPage } from '@/pages/boq/AddBoqItemPage'
 import { AddClaimPage } from '@/pages/boq/AddClaimPage'
+import { EditBoqItemPage } from '@/pages/boq/EditBoqItemPage'
+import { EditClaimPage } from '@/pages/boq/EditClaimPage'
 import { RoleRoute } from '@/components/auth/RoleRoute'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -141,6 +143,8 @@ export default function App() {
                 <Route path="/boq" element={<BoqPage />} />
                 <Route path="/boq/new" element={<AddBoqItemPage />} />
                 <Route path="/boq/claims/new" element={<AddClaimPage />} />
+                <Route path="/boq/claims/:id/edit" element={<EditClaimPage />} />
+                <Route path="/boq/:id/edit" element={<EditBoqItemPage />} />
                 <Route path="/reports" element={<ReportsPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
