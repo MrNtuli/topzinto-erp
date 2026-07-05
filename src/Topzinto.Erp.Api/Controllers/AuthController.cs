@@ -25,11 +25,16 @@ public class AuthController : ControllerBase
     [EnableRateLimiting("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
-        var result = await _authService.LoginAsync(request, ct);
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var result = await _authService.LoginAsync(request, ip, userAgent, ct);
 
         return result.Status switch
         {
             LoginStatus.Success => await LogLoginSuccess(result.Response!, ct),
+            LoginStatus.MfaRequired => Ok(new MfaChallengeResponse(
+                result.MfaToken!,
+                "Enter the 6-digit code from your authenticator app.")),
             LoginStatus.Inactive => Unauthorized(new { message = "Your account is inactive. Contact an administrator.", code = "inactive" }),
             LoginStatus.AccountLocked => Unauthorized(new
             {
@@ -102,7 +107,129 @@ public class AuthController : ControllerBase
             userAgent: Request.Headers.UserAgent.ToString(),
             ct: ct);
 
-        return Ok(new { message = "Password updated successfully." });
+        return Ok(new { message = "Password updated successfully. Other sessions have been signed out." });
+    }
+
+    [HttpPost("refresh")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.RefreshToken))
+            return Unauthorized(new { message = "Invalid or expired refresh token.", code = "invalid_refresh_token" });
+
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var result = await _authService.RefreshAsync(request, ip, userAgent, ct);
+        if (result is null)
+            return Unauthorized(new { message = "Invalid or expired refresh token.", code = "invalid_refresh_token" });
+
+        return Ok(result);
+    }
+
+    [HttpPost("logout")]
+    [Authorize]
+    public async Task<IActionResult> Logout([FromBody] LogoutRequest request, CancellationToken ct)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        await _authService.LogoutAsync(userId, request, ct);
+
+        await _auditService.LogAsync(
+            userId,
+            User.FindFirstValue(ClaimTypes.Email) ?? "",
+            "Logout",
+            "Auth",
+            "User",
+            userId.ToString(),
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            userAgent: Request.Headers.UserAgent.ToString(),
+            ct: ct);
+
+        return Ok(new { message = "Signed out successfully." });
+    }
+
+    [HttpGet("mfa/status")]
+    [Authorize]
+    public async Task<IActionResult> GetMfaStatus(CancellationToken ct)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        return Ok(await _authService.GetMfaStatusAsync(userId, ct));
+    }
+
+    [HttpPost("mfa/setup")]
+    [Authorize]
+    public async Task<IActionResult> BeginMfaSetup(CancellationToken ct)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var setup = await _authService.BeginMfaSetupAsync(userId, ct);
+        if (setup is null) return BadRequest(new { message = "Unable to start MFA setup." });
+        return Ok(setup);
+    }
+
+    [HttpPost("mfa/enable")]
+    [Authorize]
+    public async Task<IActionResult> EnableMfa([FromBody] MfaEnableRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Code))
+            return BadRequest(new { message = "Verification code is required." });
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var (success, error) = await _authService.EnableMfaAsync(userId, request, ct);
+        if (!success) return BadRequest(new { message = error ?? "Unable to enable MFA." });
+
+        await _auditService.LogAsync(
+            userId,
+            User.FindFirstValue(ClaimTypes.Email) ?? "",
+            "EnableMfa",
+            "Auth",
+            "User",
+            userId.ToString(),
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            userAgent: Request.Headers.UserAgent.ToString(),
+            ct: ct);
+
+        return Ok(new { message = "Two-factor authentication enabled." });
+    }
+
+    [HttpPost("mfa/disable")]
+    [Authorize]
+    public async Task<IActionResult> DisableMfa([FromBody] MfaDisableRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.Code))
+            return BadRequest(new { message = "Verification code is required." });
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var (success, error) = await _authService.DisableMfaAsync(userId, request, ct);
+        if (!success) return BadRequest(new { message = error ?? "Unable to disable MFA." });
+
+        await _auditService.LogAsync(
+            userId,
+            User.FindFirstValue(ClaimTypes.Email) ?? "",
+            "DisableMfa",
+            "Auth",
+            "User",
+            userId.ToString(),
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            userAgent: Request.Headers.UserAgent.ToString(),
+            ct: ct);
+
+        return Ok(new { message = "Two-factor authentication disabled." });
+    }
+
+    [HttpPost("mfa/verify")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyMfa([FromBody] MfaVerifyRequest request, CancellationToken ct)
+    {
+        if (string.IsNullOrWhiteSpace(request.MfaToken) || string.IsNullOrWhiteSpace(request.Code))
+            return BadRequest(new { message = "MFA token and verification code are required." });
+
+        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        var userAgent = Request.Headers.UserAgent.ToString();
+        var result = await _authService.VerifyMfaAsync(request, ip, userAgent, ct);
+
+        if (result.Status != LoginStatus.Success || result.Response is null)
+            return Unauthorized(new { message = "Invalid verification code.", code = "invalid_mfa_code" });
+
+        return await LogLoginSuccess(result.Response, ct);
     }
 
     [HttpPut("profile")]

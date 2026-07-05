@@ -88,6 +88,8 @@ public static class DependencyInjection
         services.AddScoped<ITimesheetService, TimesheetService>();
         services.AddScoped<IChatService, ChatService>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<ISafetyService, SafetyService>();
+        services.AddScoped<IComplianceService, ComplianceService>();
 
         var storageProvider = configuration["FileStorage:Provider"] ?? "Local";
         if (storageProvider.Equals("Minio", StringComparison.OrdinalIgnoreCase))

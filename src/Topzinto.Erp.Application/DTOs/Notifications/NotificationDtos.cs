@@ -36,3 +36,27 @@ public record UpdateCompanySettingsRequest(
     string? VatNumber,
     string? CidbNumber
 );
+
+public record EmailSettingsDto(
+    bool SmtpEnabled,
+    string? SmtpHost,
+    int? SmtpPort,
+    bool SmtpUseSsl,
+    string? SmtpUsername,
+    bool HasPassword,
+    string? EmailFromAddress,
+    string? EmailFromName
+);
+
+public record UpdateEmailSettingsRequest(
+    bool SmtpEnabled,
+    string? SmtpHost,
+    int SmtpPort,
+    bool SmtpUseSsl,
+    string? SmtpUsername,
+    string? SmtpPassword,
+    string? EmailFromAddress,
+    string? EmailFromName
+);
+
+public record TestEmailRequest(string ToEmail);

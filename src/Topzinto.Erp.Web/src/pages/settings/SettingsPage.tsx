@@ -8,6 +8,8 @@ import { useAuthStore } from '@/stores/authStore'
 import { canAccessNav } from '@/lib/roleAccess'
 import styles from '../projects/ProjectsPage.module.css'
 import localStyles from './SettingsPage.module.css'
+import { MfaSettingsCard } from './MfaSettingsCard'
+import { EmailSettingsCard } from './EmailSettingsCard'
 
 export function SettingsPage() {
   const queryClient = useQueryClient()
@@ -159,6 +161,8 @@ export function SettingsPage() {
           </form>
         </div>
 
+        <MfaSettingsCard />
+
         <div className={localStyles.card}>
           <h3>Database Backup</h3>
           <p className={localStyles.note}>
@@ -253,6 +257,8 @@ export function SettingsPage() {
             </div>
           </div>
         )}
+
+        {isAdmin && <EmailSettingsCard />}
 
         <div className={`${localStyles.card} ${localStyles.wide}`}>
           <h3>Recent Audit Log</h3>

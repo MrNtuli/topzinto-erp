@@ -213,12 +213,14 @@ public class CompanySettingsService : ICompanySettingsService
 {
     private readonly AppDbContext _db;
     private readonly IAuditService _audit;
+    private readonly IEmailService _email;
     private static readonly Guid SettingsId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
-    public CompanySettingsService(AppDbContext db, IAuditService audit)
+    public CompanySettingsService(AppDbContext db, IAuditService audit, IEmailService email)
     {
         _db = db;
         _audit = audit;
+        _email = email;
     }
 
     public async Task<CompanySettingsDto> GetAsync(CancellationToken ct = default)
@@ -268,6 +270,61 @@ public class CompanySettingsService : ICompanySettingsService
     private static CompanySettingsDto Map(CompanySetting s) => new(
         s.CompanyName, s.Tagline, s.Address, s.City, s.Province,
         s.Phone, s.Email, s.VatNumber, s.CidbNumber
+    );
+
+    public async Task<EmailSettingsDto> GetEmailSettingsAsync(CancellationToken ct = default)
+    {
+        var s = await EnsureExistsAsync(ct);
+        return MapEmail(s);
+    }
+
+    public async Task<EmailSettingsDto> UpdateEmailSettingsAsync(UpdateEmailSettingsRequest request, Guid? userId, CancellationToken ct = default)
+    {
+        var s = await EnsureExistsAsync(ct);
+        s.SmtpEnabled = request.SmtpEnabled;
+        s.SmtpHost = request.SmtpHost?.Trim();
+        s.SmtpPort = request.SmtpPort;
+        s.SmtpUseSsl = request.SmtpUseSsl;
+        s.SmtpUsername = request.SmtpUsername?.Trim();
+        if (request.SmtpPassword is not null)
+            s.SmtpPassword = string.IsNullOrWhiteSpace(request.SmtpPassword) ? null : request.SmtpPassword;
+        s.EmailFromAddress = request.EmailFromAddress?.Trim();
+        s.EmailFromName = request.EmailFromName?.Trim();
+        s.UpdatedAt = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+        await _audit.LogAsync(userId, "", "Update", "Admin", "EmailSettings", s.Id.ToString(), newValues: $"Enabled={s.SmtpEnabled}", ct: ct);
+        return MapEmail(s);
+    }
+
+    public async Task<string> TestEmailAsync(string toEmail, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(toEmail))
+            return "Recipient email is required.";
+
+        var s = await EnsureExistsAsync(ct);
+        if (!IsEmailEnabled(s))
+            return "Email is disabled. Test email was not sent.";
+
+        await _email.SendAsync(
+            toEmail.Trim(),
+            "TopZinto ERP — SMTP test",
+            "<p>This is a test email from TopZinto ERP. SMTP settings are working.</p>",
+            ct);
+
+        return "Test email sent successfully.";
+    }
+
+    private static bool IsEmailEnabled(CompanySetting s) => s.SmtpEnabled;
+
+    private static EmailSettingsDto MapEmail(CompanySetting s) => new(
+        s.SmtpEnabled,
+        s.SmtpHost,
+        s.SmtpPort,
+        s.SmtpUseSsl,
+        s.SmtpUsername,
+        !string.IsNullOrWhiteSpace(s.SmtpPassword),
+        s.EmailFromAddress,
+        s.EmailFromName
     );
 }
 

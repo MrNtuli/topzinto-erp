@@ -44,6 +44,9 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
     public DbSet<ChatChannelRead> ChatChannelReads => Set<ChatChannelRead>();
     public DbSet<ChatChannelMember> ChatChannelMembers => Set<ChatChannelMember>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<SafetyIncident> SafetyIncidents => Set<SafetyIncident>();
+    public DbSet<ComplianceRecord> ComplianceRecords => Set<ComplianceRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -317,6 +320,31 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
         {
             e.HasOne(x => x.Channel).WithMany(c => c.Members).HasForeignKey(x => x.ChannelId).OnDelete(DeleteBehavior.Cascade);
             e.HasIndex(x => new { x.ChannelId, x.UserId }).IsUnique();
+        });
+
+        builder.Entity<RefreshToken>(e =>
+        {
+            e.HasIndex(x => x.TokenHash).IsUnique();
+            e.HasIndex(x => new { x.UserId, x.RevokedAt });
+            e.Property(x => x.TokenHash).HasMaxLength(128);
+            e.HasOne<ApplicationUser>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<SafetyIncident>(e =>
+        {
+            e.HasIndex(x => new { x.ProjectId, x.IncidentDate });
+            e.Property(x => x.Title).HasMaxLength(300);
+            e.HasOne(x => x.Project).WithMany().HasForeignKey(x => x.ProjectId);
+            e.HasQueryFilter(x => !x.IsDeleted);
+        });
+
+        builder.Entity<ComplianceRecord>(e =>
+        {
+            e.HasIndex(x => x.ExpiryDate);
+            e.HasIndex(x => new { x.ProjectId, x.Type });
+            e.Property(x => x.Title).HasMaxLength(300);
+            e.HasOne(x => x.Project).WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.SetNull);
+            e.HasQueryFilter(x => !x.IsDeleted);
         });
     }
 

@@ -1,6 +1,8 @@
+using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,7 +10,9 @@ using Topzinto.Erp.Application.DTOs.Auth;
 using Topzinto.Erp.Application.Interfaces;
 using Topzinto.Erp.Api.Authorization;
 using Topzinto.Erp.Infrastructure;
+using Topzinto.Erp.Infrastructure.Identity;
 using Topzinto.Erp.Infrastructure.Persistence;
+using Topzinto.Erp.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -94,6 +98,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
                     context.Token = accessToken;
                 return Task.CompletedTask;
+            },
+            OnTokenValidated = async context =>
+            {
+                var userId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var stampClaim = context.Principal?.FindFirstValue(AuthService.SecurityStampClaimType);
+                if (userId is null || stampClaim is null)
+                {
+                    context.Fail("Invalid token.");
+                    return;
+                }
+
+                var userManager = context.HttpContext.RequestServices
+                    .GetRequiredService<UserManager<ApplicationUser>>();
+                var user = await userManager.FindByIdAsync(userId);
+                if (user is null || !user.IsActive || user.SecurityStamp != stampClaim)
+                    context.Fail("Session revoked.");
             },
         };
     });

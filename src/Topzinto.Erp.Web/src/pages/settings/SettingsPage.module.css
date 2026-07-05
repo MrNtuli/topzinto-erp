@@ -170,6 +170,19 @@
   color: var(--color-navy);
 }
 
+.checkboxLabel {
+  flex-direction: row !important;
+  align-items: center;
+  gap: 8px !important;
+  font-size: 14px !important;
+  color: var(--color-navy) !important;
+}
+
+.checkboxLabel input {
+  width: auto;
+  margin: 0;
+}
+
 .saveBtn {
   align-self: flex-start;
   padding: 10px 20px;

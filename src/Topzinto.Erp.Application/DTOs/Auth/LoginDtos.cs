@@ -8,14 +8,22 @@ public enum LoginStatus
     InvalidCredentials,
     AccountLocked,
     Inactive,
+    MfaRequired,
 }
 
 public record LoginResult(
     LoginStatus Status,
     LoginResponse? Response = null,
-    DateTimeOffset? LockoutEnd = null);
+    DateTimeOffset? LockoutEnd = null,
+    string? MfaToken = null);
 
-public record LoginResponse(string AccessToken, UserDto User);
+public record LoginResponse(string AccessToken, string RefreshToken, UserDto User);
+
+public record RefreshTokenRequest(string RefreshToken);
+
+public record RefreshTokenResponse(string AccessToken, string RefreshToken);
+
+public record LogoutRequest(string? RefreshToken);
 
 public record UserDto(
     string Id,

@@ -27,5 +27,13 @@ public class CompanySetting
     public string? Email { get; set; }
     public string? VatNumber { get; set; }
     public string? CidbNumber { get; set; }
+    public bool SmtpEnabled { get; set; }
+    public string? SmtpHost { get; set; }
+    public int? SmtpPort { get; set; }
+    public bool SmtpUseSsl { get; set; } = true;
+    public string? SmtpUsername { get; set; }
+    public string? SmtpPassword { get; set; }
+    public string? EmailFromAddress { get; set; }
+    public string? EmailFromName { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

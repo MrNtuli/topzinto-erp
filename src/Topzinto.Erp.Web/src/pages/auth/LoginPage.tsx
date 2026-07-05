@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { loginApi } from '@/api/client'
+import { verifyMfaLogin } from '@/api/auth'
 import styles from './LoginPage.module.css'
 
 export function LoginPage() {
@@ -11,6 +12,8 @@ export function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [remember, setRemember] = useState(false)
+  const [mfaToken, setMfaToken] = useState<string | null>(null)
+  const [mfaCode, setMfaCode] = useState('')
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
@@ -34,8 +37,13 @@ export function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      const res = await loginApi({ email, password, rememberMe: remember })
-      login(res.user, res.accessToken, remember)
+      const result = await loginApi({ email, password, rememberMe: remember })
+      if (result.kind === 'mfa') {
+        setMfaToken(result.mfaToken)
+        setMessage(result.message)
+        return
+      }
+      login(result.response.user, result.response.accessToken, result.response.refreshToken, remember)
       navigate('/')
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''
@@ -53,6 +61,7 @@ export function LoginPage() {
             role: 'Managing Director',
           },
           'dev-token',
+          'dev-refresh',
         )
         navigate('/')
       } else {
@@ -61,6 +70,74 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleMfaSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!mfaToken) return
+    setError('')
+    setLoading(true)
+    try {
+      const res = await verifyMfaLogin(mfaToken, mfaCode, remember)
+      login(res.user, res.accessToken, res.refreshToken, remember)
+      navigate('/')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Invalid verification code')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (mfaToken) {
+    return (
+      <div className={styles.page}>
+        <div className={styles.hero}>
+          <div className={styles.heroOverlay} />
+          <div className={styles.brand}>
+            <div className={styles.logoIcon}>T·P·Z</div>
+            <div>
+              <h1>TOPZINTO</h1>
+              <p>Smart. Proficient. Value.</p>
+            </div>
+          </div>
+        </div>
+        <div className={styles.formSide}>
+          <form className={styles.card} onSubmit={handleMfaSubmit}>
+            <h2>Two-Factor Authentication</h2>
+            <p className={styles.subtitle}>{message || 'Enter the 6-digit code from your authenticator app.'}</p>
+            {error && <div className={styles.error}>{error}</div>}
+            <label className={styles.label}>
+              Authenticator code
+              <input
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={6}
+                value={mfaCode}
+                onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
+                placeholder="000000"
+                required
+                autoComplete="one-time-code"
+              />
+            </label>
+            <button type="submit" className={styles.submit} disabled={loading || mfaCode.length < 6}>
+              {loading ? 'Verifying...' : 'Verify & Sign In'}
+            </button>
+            <button
+              type="button"
+              className={styles.forgot}
+              onClick={() => {
+                setMfaToken(null)
+                setMfaCode('')
+                setMessage('')
+              }}
+            >
+              Back to sign in
+            </button>
+          </form>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -82,7 +159,7 @@ export function LoginPage() {
           <p className={styles.subtitle}>Sign in to continue to TopZinto ERP</p>
 
           {error && <div className={styles.error}>{error}</div>}
-          {message && <div className={styles.success}>{message}</div>}
+          {message && !mfaToken && <div className={styles.success}>{message}</div>}
 
           <label className={styles.label}>
             Email Address

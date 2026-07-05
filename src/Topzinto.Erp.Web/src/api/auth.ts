@@ -48,6 +48,72 @@ export function updateProfile(data: UpdateProfileRequest) {
   return updateMyProfile(data).then(mapProfile)
 }
 
+export async function logoutApi(refreshToken?: string | null) {
+  const res = await authorizedFetch('/auth/logout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken: refreshToken ?? null }),
+  }, false)
+  if (!res.ok && res.status !== 401) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.message || 'Logout failed')
+  }
+}
+
+export function getMfaStatus() {
+  return authorizedFetch('/auth/mfa/status').then((r) => r.json()) as Promise<{ enabled: boolean }>
+}
+
+export function beginMfaSetup() {
+  return authorizedFetch('/auth/mfa/setup', { method: 'POST' }).then((r) => r.json()) as Promise<{
+    sharedKey: string
+    authenticatorUri: string
+  }>
+}
+
+export function enableMfa(code: string) {
+  return authorizedFetch('/auth/mfa/enable', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  }).then(async (r) => {
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error(err.message || 'Unable to enable MFA')
+    }
+    return r.json() as Promise<{ message: string }>
+  })
+}
+
+export function disableMfa(code: string) {
+  return authorizedFetch('/auth/mfa/disable', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  }).then(async (r) => {
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}))
+      throw new Error(err.message || 'Unable to disable MFA')
+    }
+    return r.json() as Promise<{ message: string }>
+  })
+}
+
+export async function verifyMfaLogin(mfaToken: string, code: string, rememberMe = false) {
+  const res = await fetch('/api/auth/mfa/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mfaToken, code, rememberMe }),
+  })
+  const body = await res.json().catch(() => ({}))
+  if (!res.ok) throw new Error(body.message || 'Invalid verification code')
+  return body as {
+    accessToken: string
+    refreshToken: string
+    user: { id: string; email: string; firstName: string; lastName: string; role: string }
+  }
+}
+
 export async function changePassword(data: ChangePasswordRequest) {
   const res = await authorizedFetch('/auth/change-password', {
     method: 'POST',

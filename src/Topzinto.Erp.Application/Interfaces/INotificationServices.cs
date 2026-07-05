@@ -15,4 +15,7 @@ public interface ICompanySettingsService
 {
     Task<CompanySettingsDto> GetAsync(CancellationToken ct = default);
     Task<CompanySettingsDto> UpdateAsync(UpdateCompanySettingsRequest request, Guid? userId, CancellationToken ct = default);
+    Task<EmailSettingsDto> GetEmailSettingsAsync(CancellationToken ct = default);
+    Task<EmailSettingsDto> UpdateEmailSettingsAsync(UpdateEmailSettingsRequest request, Guid? userId, CancellationToken ct = default);
+    Task<string> TestEmailAsync(string toEmail, CancellationToken ct = default);
 }

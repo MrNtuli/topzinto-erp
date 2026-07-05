@@ -133,3 +133,43 @@ export async function exportAuditLogsCsv(count = 1000) {
   a.click()
   URL.revokeObjectURL(url)
 }
+
+export interface EmailSettings {
+  smtpEnabled: boolean
+  smtpHost: string | null
+  smtpPort: number | null
+  smtpUseSsl: boolean
+  smtpUsername: string | null
+  hasPassword: boolean
+  emailFromAddress: string | null
+  emailFromName: string | null
+}
+
+export interface UpdateEmailSettingsRequest {
+  smtpEnabled: boolean
+  smtpHost: string | null
+  smtpPort: number
+  smtpUseSsl: boolean
+  smtpUsername: string | null
+  smtpPassword: string | null
+  emailFromAddress: string | null
+  emailFromName: string | null
+}
+
+export function getEmailSettings() {
+  return apiFetch<EmailSettings>('/admin/email-settings')
+}
+
+export function updateEmailSettings(data: UpdateEmailSettingsRequest) {
+  return apiFetch<EmailSettings>('/admin/email-settings', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export function sendTestEmail(toEmail: string) {
+  return apiFetch<{ message: string }>('/admin/email/test', {
+    method: 'POST',
+    body: JSON.stringify({ toEmail }),
+  })
+}

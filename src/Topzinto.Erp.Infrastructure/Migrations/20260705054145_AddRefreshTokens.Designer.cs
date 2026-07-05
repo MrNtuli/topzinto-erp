@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Topzinto.Erp.Infrastructure.Persistence;
 
@@ -10,9 +11,11 @@ using Topzinto.Erp.Infrastructure.Persistence;
 namespace Topzinto.Erp.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260705054145_AddRefreshTokens")]
+    partial class AddRefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
@@ -601,34 +604,10 @@ namespace Topzinto.Erp.Infrastructure.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("EmailFromAddress")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EmailFromName")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Phone")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Province")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("SmtpEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SmtpHost")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SmtpPassword")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("SmtpPort")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("SmtpUseSsl")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SmtpUsername")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Tagline")
@@ -644,68 +623,6 @@ namespace Topzinto.Erp.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CompanySettings");
-                });
-
-            modelBuilder.Entity("Topzinto.Erp.Domain.Entities.ComplianceRecord", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("EntityId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EntityType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("IssueDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("ProjectId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ResponsiblePerson")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExpiryDate");
-
-                    b.HasIndex("ProjectId", "Type");
-
-                    b.ToTable("ComplianceRecords");
                 });
 
             modelBuilder.Entity("Topzinto.Erp.Domain.Entities.Contract", b =>
@@ -1752,64 +1669,6 @@ namespace Topzinto.Erp.Infrastructure.Migrations
                     b.ToTable("RefreshTokens");
                 });
 
-            modelBuilder.Entity("Topzinto.Erp.Domain.Entities.SafetyIncident", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CorrectiveAction")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("IncidentDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Location")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("ProjectId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ReportedByName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Severity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProjectId", "IncidentDate");
-
-                    b.ToTable("SafetyIncidents");
-                });
-
             modelBuilder.Entity("Topzinto.Erp.Domain.Entities.SiteReport", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2431,16 +2290,6 @@ namespace Topzinto.Erp.Infrastructure.Migrations
                     b.Navigation("Client");
                 });
 
-            modelBuilder.Entity("Topzinto.Erp.Domain.Entities.ComplianceRecord", b =>
-                {
-                    b.HasOne("Topzinto.Erp.Domain.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Project");
-                });
-
             modelBuilder.Entity("Topzinto.Erp.Domain.Entities.Contract", b =>
                 {
                     b.HasOne("Topzinto.Erp.Domain.Entities.Client", "Client")
@@ -2631,17 +2480,6 @@ namespace Topzinto.Erp.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Topzinto.Erp.Domain.Entities.SafetyIncident", b =>
-                {
-                    b.HasOne("Topzinto.Erp.Domain.Entities.Project", "Project")
-                        .WithMany()
-                        .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Topzinto.Erp.Domain.Entities.SiteReport", b =>

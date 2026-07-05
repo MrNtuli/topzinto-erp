@@ -2,7 +2,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Topzinto.Erp.Application.DTOs.Admin;
+using Topzinto.Erp.Application.DTOs.Notifications;
 using Topzinto.Erp.Application.Interfaces;
+using Topzinto.Erp.Api.Authorization;
 
 namespace Topzinto.Erp.Api.Controllers;
 
@@ -15,17 +17,20 @@ public class AdminController : ControllerBase
     private readonly IBackupService _backup;
     private readonly IAppCacheInvalidator _cacheInvalidator;
     private readonly IAuditService _audit;
+    private readonly ICompanySettingsService _companySettings;
 
     public AdminController(
         IAdminService service,
         IBackupService backup,
         IAppCacheInvalidator cacheInvalidator,
-        IAuditService audit)
+        IAuditService audit,
+        ICompanySettingsService companySettings)
     {
         _service = service;
         _backup = backup;
         _cacheInvalidator = cacheInvalidator;
         _audit = audit;
+        _companySettings = companySettings;
     }
 
     private Guid ActingUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -87,6 +92,35 @@ public class AdminController : ControllerBase
     [Authorize(Roles = "Director,SuperAdmin")]
     public async Task<IActionResult> GetRoles(CancellationToken ct) =>
         Ok(await _service.GetRolesAsync(ct));
+
+    [HttpGet("roles/matrix")]
+    [Authorize(Roles = "Director,SuperAdmin")]
+    public async Task<IActionResult> GetRoleMatrix(CancellationToken ct)
+    {
+        var roles = await _service.GetRolesAsync(ct);
+        return Ok(new RoleMatrixDto(roles, ModuleRoleMatrix.BuildAccessMatrix()));
+    }
+
+    [HttpGet("email-settings")]
+    [Authorize(Roles = "Director,SuperAdmin")]
+    public async Task<IActionResult> GetEmailSettings(CancellationToken ct) =>
+        Ok(await _companySettings.GetEmailSettingsAsync(ct));
+
+    [HttpPut("email-settings")]
+    [Authorize(Roles = "Director,SuperAdmin")]
+    public async Task<IActionResult> UpdateEmailSettings([FromBody] UpdateEmailSettingsRequest request, CancellationToken ct)
+    {
+        var userId = Guid.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var id) ? id : (Guid?)null;
+        return Ok(await _companySettings.UpdateEmailSettingsAsync(request, userId, ct));
+    }
+
+    [HttpPost("email/test")]
+    [Authorize(Roles = "Director,SuperAdmin")]
+    public async Task<IActionResult> TestEmail([FromBody] TestEmailRequest request, CancellationToken ct)
+    {
+        var message = await _companySettings.TestEmailAsync(request.ToEmail, ct);
+        return Ok(new { message });
+    }
 
     [HttpPost("users")]
     [Authorize(Roles = "Director,SuperAdmin")]

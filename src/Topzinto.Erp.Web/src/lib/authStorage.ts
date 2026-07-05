@@ -18,12 +18,20 @@ export function clearAuthStorage() {
 }
 
 export function getStoredAccessToken(): string | null {
+  return getStoredAuthField('accessToken')
+}
+
+export function getStoredRefreshToken(): string | null {
+  return getStoredAuthField('refreshToken')
+}
+
+function getStoredAuthField(field: 'accessToken' | 'refreshToken'): string | null {
   for (const storage of [sessionStorage, localStorage]) {
     try {
       const raw = storage.getItem(AUTH_KEY)
       if (!raw) continue
-      const token = JSON.parse(raw)?.state?.accessToken
-      if (typeof token === 'string' && token.length > 0) return token
+      const value = JSON.parse(raw)?.state?.[field]
+      if (typeof value === 'string' && value.length > 0) return value
     } catch {
       // ignore malformed storage
     }
