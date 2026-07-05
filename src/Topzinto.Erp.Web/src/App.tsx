@@ -52,6 +52,7 @@ import { EditProjectPage } from '@/pages/projects/EditProjectPage'
 import { EditSupplierPage } from '@/pages/suppliers/EditSupplierPage'
 import { EditSiteReportPage } from '@/pages/site-reports/EditSiteReportPage'
 import { EditVehiclePage } from '@/pages/fleet/EditVehiclePage'
+import { AddFuelLogPage } from '@/pages/fleet/AddFuelLogPage'
 import { EditEquipmentPage } from '@/pages/equipment/EditEquipmentPage'
 import { EditTenderPage } from '@/pages/tenders/EditTenderPage'
 import { EditContractPage } from '@/pages/contracts/EditContractPage'
@@ -117,6 +118,7 @@ export default function App() {
                 <Route path="/fleet" element={<FleetPage />} />
                 <Route path="/fleet/new" element={<AddVehiclePage />} />
                 <Route path="/fleet/:id/edit" element={<EditVehiclePage />} />
+                <Route path="/fleet/:id/fuel/new" element={<AddFuelLogPage />} />
                 <Route path="/fleet/:id" element={<VehicleDetailPage />} />
                 <Route path="/equipment" element={<EquipmentPage />} />
                 <Route path="/equipment/new" element={<AddEquipmentPage />} />

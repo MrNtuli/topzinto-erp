@@ -381,6 +381,14 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Mobile fallback** — card list view on narrow screens; horizontal scroll chart on desktop
 - [x] **Integration tests** — `GanttDataTests.cs` smoke test
 
+### v2.41 — Fleet Fuel Log Create Form
+- [x] **Backend** — `POST /api/fleet/{id}/fuel-logs` (`CreateFuelLogRequest`: date, litres, cost, odometer, project, notes)
+- [x] **API client** — `createFuelLog` in `src/api/fleet.ts`
+- [x] **Fuel log form** — `/fleet/:id/fuel/new` with validation, loading, success and error states
+- [x] **Vehicle detail** — fuel log list shows odometer/notes; link to add fuel log
+- [x] **RBAC** — Fleet module policy (`FleetManager`, `EquipmentManager`, `OperationsManager`, `ProjectManager`, Directors)
+- [x] **Integration tests** — `FuelLogFlowTests.cs` (create success + vehicle not found)
+
 ### v2.44 — Safety MVP
 - [x] **SafetyIncident entity** — project-linked incidents with severity/status enums
 - [x] **Migration** — `AddSafetyIncidents`

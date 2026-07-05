@@ -44,6 +44,14 @@ public class FuelLogFlowTests : IClassFixture<ErpWebApplicationFactory>
         var json = await response.Content.ReadFromJsonAsync<JsonElement>();
         Assert.Equal(45.5m, json.GetProperty("litres").GetDecimal());
         Assert.Equal(950.00m, json.GetProperty("cost").GetDecimal());
+
+        var detailRequest = new HttpRequestMessage(HttpMethod.Get, $"/api/fleet/{vehicleId}");
+        detailRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var detailResponse = await _client.SendAsync(detailRequest);
+        var detail = await detailResponse.Content.ReadFromJsonAsync<JsonElement>();
+        var fuelLogs = detail.GetProperty("fuelLogs");
+        Assert.True(fuelLogs.GetArrayLength() > 0);
+        Assert.Equal("Test fuel log", fuelLogs[0].GetProperty("notes").GetString());
     }
 
     [Fact]

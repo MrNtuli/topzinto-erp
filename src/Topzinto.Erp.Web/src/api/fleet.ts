@@ -70,3 +70,29 @@ export function createVehicle(data: {
 export function updateVehicle(id: string, data: Parameters<typeof createVehicle>[0]) {
   return apiFetch<VehicleDetail>(`/fleet/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
+
+export interface FuelLog {
+  id: string
+  logDate: string
+  litres: number
+  cost: number
+  odometerReading: number | null
+  notes: string | null
+}
+
+export function createFuelLog(
+  vehicleId: string,
+  data: {
+    logDate: string
+    litres: number
+    cost: number
+    odometerReading?: number
+    projectId?: string
+    notes?: string
+  },
+) {
+  return apiFetch<FuelLog>(`/fleet/${vehicleId}/fuel-logs`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}

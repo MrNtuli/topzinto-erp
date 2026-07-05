@@ -69,10 +69,15 @@ export function VehicleDetailPage() {
               {data.fuelLogs.map((f) => (
                 <li key={f.id}>
                   <strong>{f.logDate}</strong> — {f.litres}L · R{f.cost.toLocaleString()}
+                  {f.odometerReading != null && <div>Odometer: {f.odometerReading.toLocaleString()} km</div>}
+                  {f.notes && <div>{f.notes}</div>}
                 </li>
               ))}
             </ul>
           )}
+          <p style={{ marginTop: 12 }}>
+            <Link to={`/fleet/${id}/fuel/new`}>Add fuel log</Link>
+          </p>
         </div>
       </div>
     </div>
