@@ -21,6 +21,7 @@ import {
   BarChart3,
   Settings,
   ChevronLeft,
+  ShieldAlert,
 } from 'lucide-react'
 import clsx from 'clsx'
 import { useAuthStore } from '@/stores/authStore'
@@ -36,6 +37,7 @@ const navItems = [
   { to: '/clients', icon: Users, label: 'Clients' },
   { to: '/boq', icon: Calculator, label: 'BOQ & Costing' },
   { to: '/site-reports', icon: ClipboardList, label: 'Site Reports' },
+  { to: '/safety', icon: ShieldAlert, label: 'Safety' },
   { to: '/schedule', icon: Calendar, label: 'Schedule' },
   { to: '/fleet', icon: Truck, label: 'Fleet' },
   { to: '/equipment', icon: Wrench, label: 'Equipment' },

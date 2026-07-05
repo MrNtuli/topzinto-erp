@@ -32,6 +32,7 @@ const NAV_RESTRICTIONS: Record<string, string[]> = {
   '/admin/audit': [],
   '/admin/users': [],
   '/admin/roles': [],
+  '/safety': ['SafetyOfficer'],
 }
 
 function systemRole(role: string | undefined): string {

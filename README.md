@@ -406,12 +406,14 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Navigation** — Settings → Administration link; route guard via `roleAccess.ts`
 - [x] **RBAC** — Director and SuperAdmin only (matches existing admin endpoints)
 
-### v2.44 — Safety MVP
-- [x] **SafetyIncident entity** — project-linked incidents with severity/status enums
-- [x] **Migration** — `AddSafetyIncidents`
-- [x] **API** — `SafetyController` CRUD with `ISafetyService` / `SafetyService`
-- [x] **RBAC** — `ErpModules.Safety` for Safety Officer and Directors
-- [x] **Integration tests** — `SafetyIncidentTests.cs`
+### v2.44 — Safety Incidents CRUD UI
+- [x] **Backend** — `SafetyIncident` entity, migration, `SafetyController` CRUD, `SafetyService`, integration tests
+- [x] **API client** — `src/api/safety.ts` (list, get, create, update, soft delete)
+- [x] **List page** — `/safety` with search, project/status filters, client-side pagination, severity/status badges, mobile cards
+- [x] **Create** — `/safety/new` incident report form
+- [x] **Detail** — `/safety/:id` with edit and soft-delete actions
+- [x] **Edit** — `/safety/:id/edit` form
+- [x] **Navigation** — Safety sidebar link; route guard via `roleAccess.ts` (Safety Officer + Directors)
 
 ### v2.45 — Compliance MVP
 - [x] **ComplianceRecord entity** — certificates, licences, permits with expiry tracking

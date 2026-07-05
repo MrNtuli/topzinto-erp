@@ -73,6 +73,10 @@ import { AddBoqItemPage } from '@/pages/boq/AddBoqItemPage'
 import { AddClaimPage } from '@/pages/boq/AddClaimPage'
 import { EditBoqItemPage } from '@/pages/boq/EditBoqItemPage'
 import { EditClaimPage } from '@/pages/boq/EditClaimPage'
+import { SafetyIncidentsPage } from '@/pages/safety/SafetyIncidentsPage'
+import { AddSafetyIncidentPage } from '@/pages/safety/AddSafetyIncidentPage'
+import { SafetyIncidentDetailPage } from '@/pages/safety/SafetyIncidentDetailPage'
+import { EditSafetyIncidentPage } from '@/pages/safety/EditSafetyIncidentPage'
 import { RoleRoute } from '@/components/auth/RoleRoute'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -115,6 +119,10 @@ export default function App() {
                 <Route path="/site-reports/new" element={<AddSiteReportPage />} />
                 <Route path="/site-reports/:id/edit" element={<EditSiteReportPage />} />
                 <Route path="/site-reports/:id" element={<SiteReportDetailPage />} />
+                <Route path="/safety" element={<SafetyIncidentsPage />} />
+                <Route path="/safety/new" element={<AddSafetyIncidentPage />} />
+                <Route path="/safety/:id/edit" element={<EditSafetyIncidentPage />} />
+                <Route path="/safety/:id" element={<SafetyIncidentDetailPage />} />
                 <Route path="/schedule" element={<SchedulePage />} />
                 <Route path="/schedule/gantt" element={<GanttPage />} />
                 <Route path="/schedule/new-task" element={<AddTaskPage />} />
