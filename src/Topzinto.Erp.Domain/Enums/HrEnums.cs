@@ -40,3 +40,13 @@ public enum TimesheetStatus
     Submitted,
     Approved
 }
+
+public enum AttendanceStatus
+{
+    Present,
+    Absent,
+    Late,
+    HalfDay,
+    OnLeave,
+    PublicHoliday
+}

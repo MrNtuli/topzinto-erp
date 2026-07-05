@@ -1,7 +1,7 @@
 const ADMIN_ROLES = ['SuperAdmin', 'Director', 'Super Admin', 'Managing Director']
 
 const FIELD_ROLES = ['Employee', 'Driver', 'Foreman', 'Supervisor']
-const FIELD_NAV = ['/', '/site-reports', '/schedule', '/documents', '/settings', '/profile', '/notifications', '/timesheets', '/messages']
+const FIELD_NAV = ['/', '/site-reports', '/schedule', '/documents', '/settings', '/profile', '/notifications', '/timesheets', '/attendance', '/messages']
 
 const DISPLAY_TO_SYSTEM: Record<string, string> = {
   'Managing Director': 'Director',
@@ -19,6 +19,7 @@ const DISPLAY_TO_SYSTEM: Record<string, string> = {
 const NAV_RESTRICTIONS: Record<string, string[]> = {
   '/employees': ['HR', 'OperationsManager', 'ProjectManager', 'Receptionist'],
   '/timesheets': ['HR', 'OperationsManager', 'ProjectManager', 'Supervisor', 'Foreman'],
+  '/attendance': ['HR', 'OperationsManager', 'ProjectManager', 'Supervisor', 'Foreman'],
   '/fleet': ['FleetManager', 'EquipmentManager', 'OperationsManager', 'ProjectManager'],
   '/equipment': ['EquipmentManager', 'FleetManager', 'OperationsManager', 'ProjectManager'],
   '/procurement': ['Procurement', 'Finance', 'StoreController', 'OperationsManager', 'ProjectManager'],

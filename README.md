@@ -424,6 +424,14 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Edit** — `/compliance/:id/edit` form
 - [x] **Navigation** — Compliance sidebar link; route guard via `roleAccess.ts` (Safety Officer, HR, Ops/Project Managers + Directors)
 
+### v2.46 — Attendance Module MVP
+- [x] **Backend** — `AttendanceRecord` entity, migration, `AttendanceController` CRUD, `AttendanceService`, duplicate-date validation, integration tests
+- [x] **API client** — `src/api/attendance.ts` (list, get, create, update, soft delete)
+- [x] **List page** — `/attendance` with project/employee/status/date-range filters, status badges, mobile cards
+- [x] **Create** — `/attendance/new` attendance record form
+- [x] **Edit** — `/attendance/:id/edit` form
+- [x] **Navigation** — Attendance sidebar link (after Timesheets); route guard via `roleAccess.ts` (HR, Ops/Project Managers, Supervisors, Foremen + Directors)
+
 ---
 
 ## Production Deploy (Docker)

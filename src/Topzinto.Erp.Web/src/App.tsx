@@ -69,6 +69,9 @@ import { AddTaskPage } from '@/pages/schedule/AddTaskPage'
 import { MessagesPage } from '@/pages/messages/MessagesPage'
 import { TimesheetsPage } from '@/pages/timesheets/TimesheetsPage'
 import { AddTimesheetPage } from '@/pages/timesheets/AddTimesheetPage'
+import { AttendancePage } from '@/pages/attendance/AttendancePage'
+import { AddAttendancePage } from '@/pages/attendance/AddAttendancePage'
+import { EditAttendancePage } from '@/pages/attendance/EditAttendancePage'
 import { AddBoqItemPage } from '@/pages/boq/AddBoqItemPage'
 import { AddClaimPage } from '@/pages/boq/AddClaimPage'
 import { EditBoqItemPage } from '@/pages/boq/EditBoqItemPage'
@@ -175,6 +178,9 @@ export default function App() {
                 <Route path="/timesheets" element={<TimesheetsPage />} />
                 <Route path="/timesheets/new" element={<AddTimesheetPage />} />
                 <Route path="/timesheets/:id/edit" element={<EditTimesheetPage />} />
+                <Route path="/attendance" element={<AttendancePage />} />
+                <Route path="/attendance/new" element={<AddAttendancePage />} />
+                <Route path="/attendance/:id/edit" element={<EditAttendancePage />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/admin/audit" element={<AuditLogsPage />} />
                 <Route path="/admin/users" element={<UsersPage />} />

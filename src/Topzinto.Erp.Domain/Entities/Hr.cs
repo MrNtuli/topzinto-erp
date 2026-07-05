@@ -35,3 +35,17 @@ public class TimesheetEntry : BaseEntity
     public string? Description { get; set; }
     public string? Notes { get; set; }
 }
+
+public class AttendanceRecord : BaseEntity
+{
+    public Guid EmployeeId { get; set; }
+    public Employee Employee { get; set; } = null!;
+    public Guid? ProjectId { get; set; }
+    public Project? Project { get; set; }
+    public DateTime WorkDate { get; set; } = DateTime.UtcNow.Date;
+    public AttendanceStatus Status { get; set; } = AttendanceStatus.Present;
+    public TimeSpan? CheckInTime { get; set; }
+    public TimeSpan? CheckOutTime { get; set; }
+    public decimal? HoursWorked { get; set; }
+    public string? Notes { get; set; }
+}

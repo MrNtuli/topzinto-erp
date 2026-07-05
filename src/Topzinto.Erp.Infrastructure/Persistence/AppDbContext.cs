@@ -47,6 +47,7 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<SafetyIncident> SafetyIncidents => Set<SafetyIncident>();
     public DbSet<ComplianceRecord> ComplianceRecords => Set<ComplianceRecord>();
+    public DbSet<AttendanceRecord> AttendanceRecords => Set<AttendanceRecord>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -343,6 +344,16 @@ public class AppDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid
             e.HasIndex(x => x.ExpiryDate);
             e.HasIndex(x => new { x.ProjectId, x.Type });
             e.Property(x => x.Title).HasMaxLength(300);
+            e.HasOne(x => x.Project).WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.SetNull);
+            e.HasQueryFilter(x => !x.IsDeleted);
+        });
+
+        builder.Entity<AttendanceRecord>(e =>
+        {
+            e.HasIndex(x => new { x.EmployeeId, x.WorkDate }).IsUnique();
+            e.HasIndex(x => new { x.ProjectId, x.WorkDate });
+            e.Property(x => x.HoursWorked).HasPrecision(6, 2);
+            e.HasOne(x => x.Employee).WithMany().HasForeignKey(x => x.EmployeeId);
             e.HasOne(x => x.Project).WithMany().HasForeignKey(x => x.ProjectId).OnDelete(DeleteBehavior.SetNull);
             e.HasQueryFilter(x => !x.IsDeleted);
         });

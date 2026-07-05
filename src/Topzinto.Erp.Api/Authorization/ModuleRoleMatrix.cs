@@ -20,7 +20,8 @@ public static class ModuleRoleMatrix
         new(StringComparer.OrdinalIgnoreCase)
         {
             ErpModules.Dashboard, ErpModules.SiteReports, ErpModules.Schedule, ErpModules.Documents,
-            ErpModules.Notifications, ErpModules.Timesheets, ErpModules.Chat, ErpModules.Search,
+            ErpModules.Notifications, ErpModules.Timesheets, ErpModules.Attendance, ErpModules.Chat,
+            ErpModules.Search,
             ErpModules.Settings,
         };
 
@@ -95,6 +96,11 @@ public static class ModuleRoleMatrix
             [
                 SystemRoles.SafetyOfficer, SystemRoles.HR, SystemRoles.OperationsManager,
                 SystemRoles.ProjectManager,
+            ],
+            [ErpModules.Attendance] =
+            [
+                SystemRoles.HR, SystemRoles.OperationsManager, SystemRoles.ProjectManager,
+                SystemRoles.Supervisor, SystemRoles.Foreman,
             ],
         };
 

@@ -25,6 +25,7 @@ public static class ErpModules
     public const string Settings = "Settings";
     public const string Safety = "Safety";
     public const string Compliance = "Compliance";
+    public const string Attendance = "Attendance";
 
     public const string PolicyPrefix = "Module:";
 
@@ -53,11 +54,12 @@ public static class ErpModules
     public const string SettingsPolicy = PolicyPrefix + Settings;
     public const string SafetyPolicy = PolicyPrefix + Safety;
     public const string CompliancePolicy = PolicyPrefix + Compliance;
+    public const string AttendancePolicy = PolicyPrefix + Attendance;
 
     public static readonly string[] All =
     [
         Dashboard, Projects, SiteReports, Schedule, Documents, Notifications, Chat,
         Timesheets, Employees, Fleet, Equipment, Procurement, Suppliers, Stores,
-        Boq, Reports, Tenders, Contracts, Clients, Search, Settings, Safety, Compliance,
+        Boq, Reports, Tenders, Contracts, Clients, Search, Settings, Safety, Compliance, Attendance,
     ];
 }

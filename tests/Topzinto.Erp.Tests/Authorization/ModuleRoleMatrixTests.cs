@@ -20,6 +20,7 @@ public class ModuleRoleMatrixTests
     [InlineData(ErpModules.SiteReports)]
     [InlineData(ErpModules.Schedule)]
     [InlineData(ErpModules.Timesheets)]
+    [InlineData(ErpModules.Attendance)]
     public void Foreman_CanAccessFieldModules(string module)
     {
         Assert.True(ModuleRoleMatrix.CanAccess(module, [SystemRoles.Foreman]));
@@ -54,6 +55,12 @@ public class ModuleRoleMatrixTests
     {
         Assert.True(ModuleRoleMatrix.CanAccess(ErpModules.Projects, [SystemRoles.ProjectManager]));
         Assert.True(ModuleRoleMatrix.CanAccess(ErpModules.Clients, [SystemRoles.ProjectManager]));
+    }
+
+    [Fact]
+    public void Hr_CanAccessAttendance()
+    {
+        Assert.True(ModuleRoleMatrix.CanAccess(ErpModules.Attendance, [SystemRoles.HR]));
     }
 
     [Fact]

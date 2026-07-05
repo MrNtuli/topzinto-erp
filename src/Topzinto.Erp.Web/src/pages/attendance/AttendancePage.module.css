@@ -1,0 +1,83 @@
+.statusPresent {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.statusAbsent {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.statusLate {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.statusHalfDay {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.statusOnLeave {
+  background: #f3e8ff;
+  color: #7e22ce;
+}
+
+.statusPublicHoliday {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.link {
+  color: var(--color-navy);
+  font-weight: 600;
+}
+
+.link:hover {
+  color: var(--color-orange);
+}
+
+.empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.mobileCards {
+  display: none;
+}
+
+.mobileCard {
+  padding: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+.mobileCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.mobileCardHeader strong {
+  color: var(--color-navy);
+  font-size: 15px;
+}
+
+.mobileMeta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .desktopTable {
+    display: none;
+  }
+
+  .mobileCards {
+    display: block;
+  }
+}
