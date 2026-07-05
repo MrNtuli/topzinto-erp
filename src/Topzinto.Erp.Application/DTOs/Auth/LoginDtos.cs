@@ -2,6 +2,19 @@ namespace Topzinto.Erp.Application.DTOs.Auth;
 
 public record LoginRequest(string Email, string Password);
 
+public enum LoginStatus
+{
+    Success,
+    InvalidCredentials,
+    AccountLocked,
+    Inactive,
+}
+
+public record LoginResult(
+    LoginStatus Status,
+    LoginResponse? Response = null,
+    DateTimeOffset? LockoutEnd = null);
+
 public record LoginResponse(string AccessToken, UserDto User);
 
 public record UserDto(

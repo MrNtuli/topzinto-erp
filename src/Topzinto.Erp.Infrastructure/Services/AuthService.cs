@@ -26,12 +26,28 @@ public class AuthService : IAuthService
         _email = email;
     }
 
-    public async Task<LoginResponse?> LoginAsync(LoginRequest request, CancellationToken ct = default)
+    public async Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
-        var user = await _userManager.FindByEmailAsync(request.Email);
-        if (user is null || !user.IsActive) return null;
+        var user = await _userManager.FindByEmailAsync(request.Email.Trim());
+        if (user is null)
+            return new LoginResult(LoginStatus.InvalidCredentials);
 
-        if (!await _userManager.CheckPasswordAsync(user, request.Password)) return null;
+        if (!user.IsActive)
+            return new LoginResult(LoginStatus.Inactive);
+
+        if (await _userManager.IsLockedOutAsync(user))
+            return new LoginResult(LoginStatus.AccountLocked, LockoutEnd: await _userManager.GetLockoutEndDateAsync(user));
+
+        if (!await _userManager.CheckPasswordAsync(user, request.Password))
+        {
+            await _userManager.AccessFailedAsync(user);
+            if (await _userManager.IsLockedOutAsync(user))
+                return new LoginResult(LoginStatus.AccountLocked, LockoutEnd: await _userManager.GetLockoutEndDateAsync(user));
+
+            return new LoginResult(LoginStatus.InvalidCredentials);
+        }
+
+        await _userManager.ResetAccessFailedCountAsync(user);
 
         user.LastLoginAt = DateTime.UtcNow;
         await _userManager.UpdateAsync(user);
@@ -40,16 +56,17 @@ public class AuthService : IAuthService
         var role = roles.FirstOrDefault() ?? "Employee";
         var token = GenerateToken(user, role);
 
-        return new LoginResponse(
-            token,
-            new UserDto(
-                user.Id.ToString(),
-                user.Email!,
-                user.FirstName,
-                user.LastName,
-                FormatRole(role)
-            )
-        );
+        return new LoginResult(
+            LoginStatus.Success,
+            new LoginResponse(
+                token,
+                new UserDto(
+                    user.Id.ToString(),
+                    user.Email!,
+                    user.FirstName,
+                    user.LastName,
+                    FormatRole(role)
+                )));
     }
 
     public async Task<(bool Success, string? Error)> ChangePasswordAsync(
@@ -67,6 +84,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
 
+        await _userManager.ResetAccessFailedCountAsync(user);
         return (true, null);
     }
 
@@ -143,6 +161,7 @@ public class AuthService : IAuthService
         if (!result.Succeeded)
             return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
 
+        await _userManager.ResetAccessFailedCountAsync(user);
         return (true, null);
     }
 

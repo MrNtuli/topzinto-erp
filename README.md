@@ -285,7 +285,12 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 ### v2.28 — Git & GitHub Bootstrap
 - [x] **Git-ready** — `.gitignore`, `.gitattributes` (secrets, DB, uploads excluded)
 - [x] **Setup guide** — [`docs/GITHUB.md`](docs/GITHUB.md) (init, first commit, push, CI)
-- [x] **Repo initialized** — run `git status` in project root to confirm
+- [x] **Repo live** — https://github.com/MrNtuli/topzinto-erp
+
+### v2.29 — Account Lockout
+- [x] **Failed login limit** — account locked for 30 minutes after 5 wrong passwords
+- [x] **Clear messaging** — login page shows lockout time remaining
+- [x] **Auto reset** — lockout cleared on successful login, password change, or reset
 
 ---
 

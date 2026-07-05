@@ -35,11 +35,11 @@ export async function loginApi(data: LoginRequest): Promise<LoginResponse> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
+  const body = await res.json().catch(() => ({}))
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.message || 'Login failed')
+    throw new Error(body.message || 'Login failed')
   }
-  return res.json()
+  return body
 }
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {

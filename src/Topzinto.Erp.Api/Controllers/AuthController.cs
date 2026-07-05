@@ -24,21 +24,44 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
         var result = await _authService.LoginAsync(request, ct);
-        if (result is null)
-            return Unauthorized(new { message = "Invalid email or password" });
 
+        return result.Status switch
+        {
+            LoginStatus.Success => await LogLoginSuccess(result.Response!, ct),
+            LoginStatus.Inactive => Unauthorized(new { message = "Your account is inactive. Contact an administrator.", code = "inactive" }),
+            LoginStatus.AccountLocked => Unauthorized(new
+            {
+                message = FormatLockoutMessage(result.LockoutEnd),
+                code = "account_locked",
+                lockoutEnd = result.LockoutEnd,
+            }),
+            _ => Unauthorized(new { message = "Invalid email or password", code = "invalid_credentials" }),
+        };
+    }
+
+    private async Task<IActionResult> LogLoginSuccess(LoginResponse response, CancellationToken ct)
+    {
         await _auditService.LogAsync(
-            Guid.Parse(result.User.Id),
-            result.User.Email,
+            Guid.Parse(response.User.Id),
+            response.User.Email,
             "Login",
             "Auth",
             "User",
-            result.User.Id,
+            response.User.Id,
             ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
             userAgent: Request.Headers.UserAgent.ToString(),
             ct: ct);
 
-        return Ok(result);
+        return Ok(response);
+    }
+
+    private static string FormatLockoutMessage(DateTimeOffset? lockoutEnd)
+    {
+        if (lockoutEnd is null || lockoutEnd <= DateTimeOffset.UtcNow)
+            return "Account temporarily locked due to too many failed attempts. Try again later.";
+
+        var minutes = Math.Max(1, (int)Math.Ceiling((lockoutEnd.Value - DateTimeOffset.UtcNow).TotalMinutes));
+        return $"Account locked after too many failed attempts. Try again in about {minutes} minute(s).";
     }
 
     [HttpGet("me")]

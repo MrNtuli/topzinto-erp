@@ -37,9 +37,13 @@ export function LoginPage() {
       const res = await loginApi({ email, password })
       login(res.user, res.accessToken)
       navigate('/')
-    } catch {
-      // Dev fallback when API unavailable
-      if (email && password.length >= 4) {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : ''
+      const apiUnavailable = !msg || msg === 'Failed to fetch' || msg.includes('NetworkError')
+
+      if (!apiUnavailable && msg) {
+        setError(msg)
+      } else if (email && password.length >= 4) {
         login(
           {
             id: '1',
@@ -52,7 +56,7 @@ export function LoginPage() {
         )
         navigate('/')
       } else {
-        setError('Invalid email or password')
+        setError(msg || 'Invalid email or password')
       }
     } finally {
       setLoading(false)
