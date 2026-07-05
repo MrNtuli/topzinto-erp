@@ -15,6 +15,7 @@ import { SiteReportsPage } from '@/pages/site-reports/SiteReportsPage'
 import { AddSiteReportPage } from '@/pages/site-reports/AddSiteReportPage'
 import { SiteReportDetailPage } from '@/pages/site-reports/SiteReportDetailPage'
 import { SchedulePage } from '@/pages/schedule/SchedulePage'
+import { GanttPage } from '@/pages/schedule/GanttPage'
 import { FleetPage } from '@/pages/fleet/FleetPage'
 import { VehicleDetailPage } from '@/pages/fleet/VehicleDetailPage'
 import { EquipmentPage } from '@/pages/equipment/EquipmentPage'
@@ -111,6 +112,7 @@ export default function App() {
                 <Route path="/site-reports/:id/edit" element={<EditSiteReportPage />} />
                 <Route path="/site-reports/:id" element={<SiteReportDetailPage />} />
                 <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/schedule/gantt" element={<GanttPage />} />
                 <Route path="/schedule/new-task" element={<AddTaskPage />} />
                 <Route path="/fleet" element={<FleetPage />} />
                 <Route path="/fleet/new" element={<AddVehiclePage />} />

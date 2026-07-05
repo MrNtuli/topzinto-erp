@@ -63,3 +63,36 @@ export function createProjectTask(data: {
     body: JSON.stringify(data),
   })
 }
+
+export interface GanttTask {
+  id: string
+  projectId: string
+  projectName: string
+  title: string
+  startDate: string | null
+  endDate: string | null
+  status: string
+  priority: string
+  milestoneId: string | null
+}
+
+export interface GanttMilestone {
+  id: string
+  projectId: string
+  projectName: string
+  name: string
+  startDate: string | null
+  endDate: string
+  status: string
+  progress: number
+}
+
+export interface GanttData {
+  tasks: GanttTask[]
+  milestones: GanttMilestone[]
+}
+
+export function getGanttData(projectId?: string) {
+  const query = projectId ? `?projectId=${encodeURIComponent(projectId)}` : ''
+  return apiFetch<GanttData>(`/schedule/gantt${query}`)
+}

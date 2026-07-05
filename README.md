@@ -372,9 +372,13 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **API client** — `getProjectActivity` in `src/api/projects.ts`
 - [x] **Integration tests** — `ProjectActivityTests.cs`
 
-### v2.40 — Schedule Gantt Data
+### v2.40 — Schedule Gantt
 - [x] **Gantt endpoint** — `GET /api/schedule/gantt?projectId=` returns `GanttDataDto` with tasks and milestones
 - [x] **Schedule service** — `ScheduleService.GetGanttDataAsync` with optional project filter
+- [x] **Gantt UI** — `/schedule/gantt` CSS-based horizontal bar chart with project filter
+- [x] **Schedule navigation** — Timeline / Gantt sub-nav on Schedule pages
+- [x] **API client** — `getGanttData` in `src/api/schedule.ts`
+- [x] **Mobile fallback** — card list view on narrow screens; horizontal scroll chart on desktop
 - [x] **Integration tests** — `GanttDataTests.cs` smoke test
 
 ### v2.44 — Safety MVP

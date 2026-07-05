@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { Plus } from 'lucide-react'
 import { getScheduleEvents } from '@/api/schedule'
+import { ScheduleSubNav } from './ScheduleSubNav'
 import styles from './SchedulePage.module.css'
 import pageStyles from '../projects/ProjectsPage.module.css'
 
@@ -41,6 +42,8 @@ export function SchedulePage() {
           </Link>
         </div>
       </header>
+
+      <ScheduleSubNav />
 
       {isLoading && <p>Loading schedule...</p>}
       {isError && <p className={styles.hint}>Start the API to load schedule events.</p>}
