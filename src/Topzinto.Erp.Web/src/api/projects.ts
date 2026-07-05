@@ -68,6 +68,21 @@ export function updateProject(id: string, data: {
   return apiFetch<ProjectDetail>(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) })
 }
 
+export interface ProjectActivityItem {
+  id: string
+  action: string
+  module: string
+  entityType: string
+  entityId: string
+  userEmail: string
+  createdAt: string
+  summary: string
+}
+
+export function getProjectActivity(projectId: string) {
+  return apiFetch<ProjectActivityItem[]>(`/projects/${projectId}/activity`)
+}
+
 export function formatCurrency(amount: number) {
   return new Intl.NumberFormat('en-ZA', {
     style: 'currency',

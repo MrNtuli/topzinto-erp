@@ -7,6 +7,7 @@ import { getBoqItems, getClaims, getInvoices, formatCurrency as fmtBoq } from '@
 import { getTimesheets } from '@/api/timesheets'
 import { getSiteReports } from '@/api/siteReports'
 import { getDocuments } from '@/api/documents'
+import { ProjectActivityFeed } from './ProjectActivityFeed'
 import styles from './ProjectDetailPage.module.css'
 import tableStyles from '../projects/ProjectsPage.module.css'
 import detailStyles from '../clients/ClientDetailPage.module.css'
@@ -349,11 +350,7 @@ export function ProjectDetailPage() {
         </div>
       )}
 
-      {tab === 'Activity' && (
-        <div className={styles.card}>
-          <p>Project activity feed coming in a future release.</p>
-        </div>
-      )}
+      {tab === 'Activity' && id && <ProjectActivityFeed projectId={id} />}
     </div>
   )
 }

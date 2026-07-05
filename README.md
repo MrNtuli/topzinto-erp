@@ -368,6 +368,8 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 ### v2.39 — Project Activity Feed
 - [x] **Activity endpoint** — `GET /api/projects/{id}/activity` returns audit-based `ActivityItemDto` list
 - [x] **Cross-entity scope** — Project, tasks, milestones, site reports, BOQ, claims and documents
+- [x] **Project detail UI** — Activity tab timeline with loading, empty and error states (latest 100 events)
+- [x] **API client** — `getProjectActivity` in `src/api/projects.ts`
 - [x] **Integration tests** — `ProjectActivityTests.cs`
 
 ### v2.40 — Schedule Gantt Data
