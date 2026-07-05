@@ -23,6 +23,8 @@ public interface IAdminService
 
     Task<(bool Success, string? Error)> ResetPasswordAsync(Guid id, AdminResetPasswordRequest request, CancellationToken ct = default);
 
+    Task<(bool Success, string? Error)> UnlockUserAsync(Guid id, CancellationToken ct = default);
+
 }
 
 

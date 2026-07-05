@@ -38,7 +38,7 @@ public class HealthController : ControllerBase
         {
             status = "healthy",
             service = "TopZinto ERP API",
-            version = "2.29",
+            version = "2.30",
             cache = cacheStatus,
             email = email.IsEnabled ? "smtp" : "disabled",
         });

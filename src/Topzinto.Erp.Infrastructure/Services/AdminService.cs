@@ -98,7 +98,9 @@ public class AdminService : IAdminService
 
             var systemRole = roles.FirstOrDefault() ?? SystemRoles.Employee;
 
-            result.Add(MapUser(user, systemRole));
+            var isLockedOut = await _userManager.IsLockedOutAsync(user);
+
+            result.Add(MapUser(user, systemRole, isLockedOut));
 
         }
 
@@ -170,7 +172,7 @@ public class AdminService : IAdminService
 
         await _userManager.AddToRoleAsync(user, request.Role);
 
-        return (MapUser(user, request.Role), null);
+        return (MapUser(user, request.Role, false), null);
 
     }
 
@@ -238,7 +240,7 @@ public class AdminService : IAdminService
 
 
 
-        return (MapUser(user, request.Role), null);
+        return (MapUser(user, request.Role, await _userManager.IsLockedOutAsync(user)), null);
 
     }
 
@@ -270,13 +272,41 @@ public class AdminService : IAdminService
 
 
 
+        await _userManager.ResetAccessFailedCountAsync(user);
+
         return (true, null);
 
     }
 
 
 
-    private static UserAdminDto MapUser(ApplicationUser user, string systemRole) =>
+    public async Task<(bool Success, string? Error)> UnlockUserAsync(Guid id, CancellationToken ct = default)
+
+    {
+
+        var user = await _userManager.FindByIdAsync(id.ToString());
+
+        if (user is null) return (false, "User not found.");
+
+
+
+        var result = await _userManager.SetLockoutEndDateAsync(user, null);
+
+        if (!result.Succeeded)
+
+            return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
+
+
+
+        await _userManager.ResetAccessFailedCountAsync(user);
+
+        return (true, null);
+
+    }
+
+
+
+    private static UserAdminDto MapUser(ApplicationUser user, string systemRole, bool isLockedOut) =>
 
         new(
 
@@ -293,6 +323,8 @@ public class AdminService : IAdminService
             systemRole,
 
             user.IsActive,
+
+            isLockedOut,
 
             user.LastLoginAt?.ToString("yyyy-MM-dd HH:mm")
 

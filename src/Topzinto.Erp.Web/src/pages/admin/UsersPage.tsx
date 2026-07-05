@@ -8,6 +8,7 @@ import {
   createUser,
   updateUser,
   resetUserPassword,
+  unlockUser,
   type UserAdmin,
 } from '@/api/admin'
 import { useAuthStore } from '@/stores/authStore'
@@ -67,6 +68,11 @@ export function UsersPage() {
       setResetId(null)
       setResetPassword('')
     },
+  })
+
+  const unlockMutation = useMutation({
+    mutationFn: unlockUser,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
   })
 
   function startEdit(user: UserAdmin) {
@@ -282,9 +288,13 @@ export function UsersPage() {
                 <td>{user.email}</td>
                 <td>{user.role}</td>
                 <td>
-                  <span className={user.isActive ? styles.badge : localStyles.inactiveBadge}>
-                    {user.isActive ? 'Active' : 'Inactive'}
-                  </span>
+                  {user.isLockedOut ? (
+                    <span className={localStyles.lockedBadge}>Locked</span>
+                  ) : (
+                    <span className={user.isActive ? styles.badge : localStyles.inactiveBadge}>
+                      {user.isActive ? 'Active' : 'Inactive'}
+                    </span>
+                  )}
                 </td>
                 <td>{user.lastLoginAt ?? '—'}</td>
                 <td>
@@ -293,6 +303,15 @@ export function UsersPage() {
                     <button type="button" onClick={() => { setResetId(user.id); setEditingId(null) }}>
                       Reset PW
                     </button>
+                    {user.isLockedOut && (
+                      <button
+                        type="button"
+                        onClick={() => unlockMutation.mutate(user.id)}
+                        disabled={unlockMutation.isPending}
+                      >
+                        Unlock
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

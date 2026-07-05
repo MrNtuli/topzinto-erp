@@ -292,6 +292,11 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Clear messaging** — login page shows lockout time remaining
 - [x] **Auto reset** — lockout cleared on successful login, password change, or reset
 
+### v2.30 — Admin Unlock Account
+- [x] **Locked indicator** — user list shows Locked status after failed login attempts
+- [x] **Director unlock** — `/admin/users` → Unlock button clears lockout immediately
+- [x] **Audit trail** — unlock actions logged
+
 ---
 
 ## Production Deploy (Docker)

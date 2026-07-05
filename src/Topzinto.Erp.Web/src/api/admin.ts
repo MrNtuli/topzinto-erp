@@ -33,6 +33,7 @@ export interface UserAdmin {
   role: string
   systemRole: string
   isActive: boolean
+  isLockedOut: boolean
   lastLoginAt: string | null
 }
 
@@ -107,6 +108,10 @@ export async function resetUserPassword(id: string, newPassword: string) {
     throw new Error(err.message || 'Password reset failed')
   }
   return res.json() as Promise<{ message: string }>
+}
+
+export function unlockUser(id: string) {
+  return apiFetch<{ message: string }>(`/admin/users/${id}/unlock`, { method: 'POST' })
 }
 
 export async function invalidateCache() {

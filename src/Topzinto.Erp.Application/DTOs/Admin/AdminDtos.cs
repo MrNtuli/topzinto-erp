@@ -40,6 +40,8 @@ public record UserAdminDto(
 
     bool IsActive,
 
+    bool IsLockedOut,
+
     string? LastLoginAt
 
 );

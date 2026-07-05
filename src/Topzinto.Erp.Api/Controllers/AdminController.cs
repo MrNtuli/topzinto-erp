@@ -155,4 +155,26 @@ public class AdminController : ControllerBase
 
         return Ok(new { message = "Password reset successfully." });
     }
+
+    [HttpPost("users/{id:guid}/unlock")]
+    [Authorize(Roles = "Director,SuperAdmin")]
+    public async Task<IActionResult> UnlockUser(Guid id, CancellationToken ct)
+    {
+        var (success, error) = await _service.UnlockUserAsync(id, ct);
+        if (!success)
+            return BadRequest(new { message = error ?? "Unable to unlock user." });
+
+        await _audit.LogAsync(
+            ActingUserId,
+            ActingUserEmail,
+            "UnlockUser",
+            "Admin",
+            "User",
+            id.ToString(),
+            ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+            userAgent: Request.Headers.UserAgent.ToString(),
+            ct: ct);
+
+        return Ok(new { message = "Account unlocked successfully." });
+    }
 }
