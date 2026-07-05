@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { useAuthStore } from '@/stores/authStore'
 import { NotificationBell } from './NotificationBell'
@@ -23,7 +24,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
       <div className={styles.right}>
         <NotificationBell />
 
-        <div className={styles.profile}>
+        <Link to="/profile" className={styles.profile} title="My Profile">
           <div className={styles.avatar}>
             {user?.firstName?.[0]}
             {user?.lastName?.[0]}
@@ -34,7 +35,7 @@ export function TopBar({ onMenuClick }: TopBarProps) {
             </span>
             <span className={styles.profileRole}>{user?.role}</span>
           </div>
-        </div>
+        </Link>
       </div>
     </header>
   )

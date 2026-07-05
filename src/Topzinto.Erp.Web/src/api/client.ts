@@ -1,8 +1,11 @@
 const API_BASE = '/api'
 
+import { clearAuthStorage, getStoredAccessToken } from '@/lib/authStorage'
+
 export interface LoginRequest {
   email: string
   password: string
+  rememberMe?: boolean
 }
 
 export interface LoginResponse {
@@ -17,7 +20,7 @@ export interface LoginResponse {
 }
 
 export function clearSessionAndRedirect(reason = 'session-expired') {
-  localStorage.removeItem('topzinto-auth')
+  clearAuthStorage()
   if (!window.location.pathname.startsWith('/login')) {
     window.location.href = `/login?reason=${encodeURIComponent(reason)}`
   }
@@ -43,7 +46,7 @@ export async function loginApi(data: LoginRequest): Promise<LoginResponse> {
 }
 
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
@@ -61,7 +64,7 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
 }
 
 export async function authorizedFetch(path: string, options: RequestInit = {}) {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {

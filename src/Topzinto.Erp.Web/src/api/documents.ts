@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { getStoredAccessToken } from '@/lib/authStorage'
 
 export interface DocumentSummary {
   total: number
@@ -52,7 +53,7 @@ export function createDocument(data: {
 }
 
 export async function uploadDocumentFile(id: string, file: File) {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const form = new FormData()
   form.append('file', file)
   const res = await fetch(`/api/documents/${id}/upload`, {
@@ -69,7 +70,7 @@ export function getDocumentDownloadUrl(id: string) {
 }
 
 export async function downloadDocumentFile(id: string, fileName?: string | null) {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const res = await fetch(`/api/documents/${id}/download`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })

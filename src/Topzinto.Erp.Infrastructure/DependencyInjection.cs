@@ -51,6 +51,9 @@ public static class DependencyInjection
             .AddUserManager<UserManager<ApplicationUser>>()
             .AddDefaultTokenProviders();
 
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+            options.TokenLifespan = TimeSpan.FromHours(1));
+
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuditService, AuditService>();
         services.AddScoped<IClientService, ClientService>();

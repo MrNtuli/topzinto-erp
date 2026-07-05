@@ -1,4 +1,5 @@
 import { apiFetch } from './client'
+import { getStoredAccessToken } from '@/lib/authStorage'
 
 export interface ChatChannel {
   id: string
@@ -58,7 +59,7 @@ export function sendChatMessage(channelId: string, content: string) {
 }
 
 export async function sendChatMessageWithFile(channelId: string, file: File, content?: string) {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const form = new FormData()
   form.append('file', file)
   if (content?.trim()) form.append('content', content.trim())
@@ -77,7 +78,7 @@ export function getChatAttachmentUrl(messageId: string) {
 }
 
 export async function downloadChatAttachment(messageId: string, fileName: string) {
-  const token = JSON.parse(localStorage.getItem('topzinto-auth') || '{}')?.state?.accessToken
+  const token = getStoredAccessToken()
   const res = await fetch(getChatAttachmentUrl(messageId), {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   })

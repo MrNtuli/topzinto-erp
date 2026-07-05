@@ -28,6 +28,7 @@ import { StockTransactionsPage } from '@/pages/stores/StockTransactionsPage'
 import { BoqPage } from '@/pages/boq/BoqPage'
 import { ReportsPage } from '@/pages/reports/ReportsPage'
 import { SettingsPage } from '@/pages/settings/SettingsPage'
+import { ProfilePage } from '@/pages/profile/ProfilePage'
 import { DocumentsPage } from '@/pages/documents/DocumentsPage'
 import { EmployeesPage } from '@/pages/employees/EmployeesPage'
 import { EmployeeDetailPage } from '@/pages/employees/EmployeeDetailPage'
@@ -137,6 +138,7 @@ export default function App() {
                 <Route path="/boq/new" element={<AddBoqItemPage />} />
                 <Route path="/boq/claims/new" element={<AddClaimPage />} />
                 <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/documents" element={<DocumentsPage />} />
                 <Route path="/documents/new" element={<AddDocumentPage />} />

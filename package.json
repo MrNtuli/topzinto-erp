@@ -1,0 +1,8 @@
+{
+  "name": "topzinto-erp",
+  "private": true,
+  "description": "TopZinto Enterprise Construction ERP — monorepo root",
+  "scripts": {
+    "dev:all": "node ./scripts/launch-dev.mjs"
+  }
+}

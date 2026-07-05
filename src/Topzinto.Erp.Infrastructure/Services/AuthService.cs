@@ -3,8 +3,10 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Topzinto.Erp.Application.DTOs.Auth;
+using Topzinto.Erp.Application.DTOs.Users;
 using Topzinto.Erp.Application.Interfaces;
 using Topzinto.Erp.Infrastructure.Identity;
 
@@ -15,15 +17,18 @@ public class AuthService : IAuthService
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IConfiguration _configuration;
     private readonly IEmailService _email;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthService(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IEmailService email)
+        IEmailService email,
+        ILogger<AuthService> logger)
     {
         _userManager = userManager;
         _configuration = configuration;
         _email = email;
+        _logger = logger;
     }
 
     public async Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken ct = default)
@@ -54,7 +59,7 @@ public class AuthService : IAuthService
 
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Employee";
-        var token = GenerateToken(user, role);
+        var token = GenerateToken(user, role, request.RememberMe);
 
         return new LoginResult(
             LoginStatus.Success,
@@ -93,25 +98,63 @@ public class AuthService : IAuthService
         UpdateProfileRequest request,
         CancellationToken ct = default)
     {
+        var profile = await UpdateMyProfileAsync(
+            userId,
+            new UpdateMyProfileRequest(request.FirstName, request.LastName, null),
+            ct);
+
+        if (profile is null) return null;
+
+        return new UserDto(
+            profile.Id,
+            profile.Email,
+            profile.FirstName,
+            profile.LastName,
+            profile.Role
+        );
+    }
+
+    public async Task<UserProfileDto?> GetMyProfileAsync(Guid userId, CancellationToken ct = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null) return null;
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var role = roles.FirstOrDefault() ?? "Employee";
+
+        return MapProfile(user, FormatRole(role));
+    }
+
+    public async Task<UserProfileDto?> UpdateMyProfileAsync(
+        Guid userId,
+        UpdateMyProfileRequest request,
+        CancellationToken ct = default)
+    {
         var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null) return null;
 
         user.FirstName = request.FirstName.Trim();
         user.LastName = request.LastName.Trim();
+        user.PhoneNumber = string.IsNullOrWhiteSpace(request.Phone) ? null : request.Phone.Trim();
+
         var result = await _userManager.UpdateAsync(user);
         if (!result.Succeeded) return null;
 
         var roles = await _userManager.GetRolesAsync(user);
         var role = roles.FirstOrDefault() ?? "Employee";
 
-        return new UserDto(
-            user.Id.ToString(),
-            user.Email!,
-            user.FirstName,
-            user.LastName,
-            FormatRole(role)
-        );
+        return MapProfile(user, FormatRole(role));
     }
+
+    private static UserProfileDto MapProfile(ApplicationUser user, string role) => new(
+        user.Id.ToString(),
+        user.Email!,
+        user.FirstName,
+        user.LastName,
+        user.PhoneNumber,
+        role,
+        user.LastLoginAt?.ToString("yyyy-MM-dd HH:mm")
+    );
 
     public async Task<ForgotPasswordResponse> RequestPasswordResetAsync(
         ForgotPasswordRequest request,
@@ -146,6 +189,9 @@ public class AuthService : IAuthService
         }
 
         var devLink = includeDevLink && !_email.IsEnabled ? resetLink : null;
+        if (devLink is not null)
+            _logger.LogInformation("Password reset link (dev, SMTP off) for {Email}: {Link}", user.Email, resetLink);
+
         return new ForgotPasswordResponse(message, devLink);
     }
 
@@ -159,7 +205,12 @@ public class AuthService : IAuthService
 
         var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
         if (!result.Succeeded)
+        {
+            if (result.Errors.Any(e => e.Code is "InvalidToken"))
+                return (false, "Invalid or expired reset link.");
+
             return (false, string.Join(" ", result.Errors.Select(e => e.Description)));
+        }
 
         await _userManager.ResetAccessFailedCountAsync(user);
         return (true, null);
@@ -173,7 +224,7 @@ public class AuthService : IAuthService
         return $"{baseUrl}/reset-password?email={encodedEmail}&token={encodedToken}";
     }
 
-    private string GenerateToken(ApplicationUser user, string role)
+    private string GenerateToken(ApplicationUser user, string role, bool rememberMe)
     {
         var key = new SymmetricSecurityKey(
             Encoding.UTF8.GetBytes(_configuration["Jwt:Key"] ?? throw new InvalidOperationException("Jwt:Key not configured")));
@@ -188,11 +239,15 @@ public class AuthService : IAuthService
             new(ClaimTypes.Role, role),
         };
 
+        var expiry = rememberMe
+            ? DateTime.UtcNow.AddDays(_configuration.GetValue("Jwt:RememberMeDays", 7))
+            : DateTime.UtcNow.AddHours(_configuration.GetValue("Jwt:SessionHours", 8));
+
         var token = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(8),
+            expires: expiry,
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

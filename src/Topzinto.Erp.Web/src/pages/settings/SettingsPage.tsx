@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { getCurrentUser, changePassword, updateProfile } from '@/api/auth'
+import { changePassword } from '@/api/auth'
 import { getAuditLogs, getBackupHub, createBackup, downloadBackupFile, scanSystemAlerts } from '@/api/admin'
 import { getCompanySettings, updateCompanySettings, type CompanySettings } from '@/api/company'
 import { useAuthStore } from '@/stores/authStore'
@@ -11,20 +11,8 @@ import localStyles from './SettingsPage.module.css'
 
 export function SettingsPage() {
   const queryClient = useQueryClient()
-  const updateUser = useAuthStore((s) => s.updateUser)
   const role = useAuthStore((s) => s.user?.role)
   const isAdmin = canAccessNav(role, '/admin/users')
-
-  const { data: user, isLoading } = useQuery({
-    queryKey: ['current-user'],
-    queryFn: getCurrentUser,
-    retry: false,
-  })
-
-  const [profileForm, setProfileForm] = useState({ firstName: '', lastName: '' })
-  useEffect(() => {
-    if (user) setProfileForm({ firstName: user.firstName, lastName: user.lastName })
-  }, [user])
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -65,20 +53,17 @@ export function SettingsPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['company-settings'] }),
   })
 
-  const profileMutation = useMutation({
-    mutationFn: updateProfile,
-    onSuccess: (updated) => {
-      updateUser(updated)
-      queryClient.setQueryData(['current-user'], updated)
-    },
-  })
-
   const passwordMutation = useMutation({
     mutationFn: changePassword,
     onSuccess: () => {
       setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' })
     },
   })
+
+  function updatePasswordField<K extends keyof typeof passwordForm>(key: K, value: string) {
+    if (passwordMutation.isSuccess || passwordMutation.isError) passwordMutation.reset()
+    setPasswordForm((f) => ({ ...f, [key]: value }))
+  }
 
   const alertScanMutation = useMutation({
     mutationFn: scanSystemAlerts,
@@ -96,45 +81,10 @@ export function SettingsPage() {
       <div className={localStyles.grid}>
         <div className={localStyles.card}>
           <h3>My Profile</h3>
-          {isLoading ? <p>Loading...</p> : user ? (
-            <>
-              <dl className={localStyles.dl}>
-                <dt>Email</dt><dd>{user.email}</dd>
-                <dt>Role</dt><dd><span className={localStyles.roleBadge}>{user.role}</span></dd>
-              </dl>
-              <form
-                className={localStyles.form}
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  profileMutation.mutate(profileForm)
-                }}
-              >
-                <div className={localStyles.formRow}>
-                  <label>
-                    First name
-                    <input
-                      value={profileForm.firstName}
-                      onChange={(e) => setProfileForm((f) => ({ ...f, firstName: e.target.value }))}
-                      required
-                    />
-                  </label>
-                  <label>
-                    Last name
-                    <input
-                      value={profileForm.lastName}
-                      onChange={(e) => setProfileForm((f) => ({ ...f, lastName: e.target.value }))}
-                      required
-                    />
-                  </label>
-                </div>
-                <button type="submit" className={localStyles.saveBtn} disabled={profileMutation.isPending}>
-                  {profileMutation.isPending ? 'Saving...' : 'Save Profile'}
-                </button>
-                {profileMutation.isSuccess && <p className={localStyles.success}>Profile updated.</p>}
-                {profileMutation.isError && <p className={localStyles.error}>Unable to update profile.</p>}
-              </form>
-            </>
-          ) : <p>Unable to load profile.</p>}
+          <p className={localStyles.note}>
+            Update your name, phone number, and view your account details.
+          </p>
+          <Link to="/profile" className={localStyles.link}>Go to My Profile</Link>
         </div>
 
         <div className={localStyles.card}>
@@ -158,7 +108,7 @@ export function SettingsPage() {
               <input
                 type="password"
                 value={passwordForm.currentPassword}
-                onChange={(e) => setPasswordForm((f) => ({ ...f, currentPassword: e.target.value }))}
+                onChange={(e) => updatePasswordField('currentPassword', e.target.value)}
                 required
                 autoComplete="current-password"
               />
@@ -169,7 +119,7 @@ export function SettingsPage() {
                 <input
                   type="password"
                   value={passwordForm.newPassword}
-                  onChange={(e) => setPasswordForm((f) => ({ ...f, newPassword: e.target.value }))}
+                  onChange={(e) => updatePasswordField('newPassword', e.target.value)}
                   required
                   minLength={8}
                   autoComplete="new-password"
@@ -180,7 +130,7 @@ export function SettingsPage() {
                 <input
                   type="password"
                   value={passwordForm.confirmPassword}
-                  onChange={(e) => setPasswordForm((f) => ({ ...f, confirmPassword: e.target.value }))}
+                  onChange={(e) => updatePasswordField('confirmPassword', e.target.value)}
                   required
                   minLength={8}
                   autoComplete="new-password"

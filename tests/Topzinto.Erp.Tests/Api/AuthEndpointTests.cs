@@ -6,6 +6,7 @@ using Topzinto.Erp.Tests.Infrastructure;
 
 namespace Topzinto.Erp.Tests.Api;
 
+[Collection("Api")]
 public class AuthEndpointTests : IClassFixture<ErpWebApplicationFactory>
 {
     private readonly HttpClient _client;

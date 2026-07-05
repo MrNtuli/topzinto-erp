@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { authPersistStorage, setRememberPreference } from '@/lib/authStorage'
 
 export interface AuthUser {
   id: string
@@ -13,7 +14,7 @@ interface AuthState {
   user: AuthUser | null
   accessToken: string | null
   isAuthenticated: boolean
-  login: (user: AuthUser, token: string) => void
+  login: (user: AuthUser, token: string, remember?: boolean) => void
   updateUser: (user: AuthUser) => void
   logout: () => void
 }
@@ -24,10 +25,16 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       accessToken: null,
       isAuthenticated: false,
-      login: (user, accessToken) => set({ user, accessToken, isAuthenticated: true }),
+      login: (user, accessToken, remember = false) => {
+        setRememberPreference(remember)
+        set({ user, accessToken, isAuthenticated: true })
+      },
       updateUser: (user) => set({ user }),
       logout: () => set({ user: null, accessToken: null, isAuthenticated: false }),
     }),
-    { name: 'topzinto-auth' },
+    {
+      name: 'topzinto-auth',
+      storage: createJSONStorage(() => authPersistStorage),
+    },
   ),
 )

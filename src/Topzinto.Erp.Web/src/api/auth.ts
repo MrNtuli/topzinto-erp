@@ -1,4 +1,5 @@
-import { apiFetch, authorizedFetch } from './client'
+import { authorizedFetch } from './client'
+import { getMyProfile, updateMyProfile, type UserProfile } from './users'
 
 export interface CurrentUser {
   id: string
@@ -6,6 +7,8 @@ export interface CurrentUser {
   firstName: string
   lastName: string
   role: string
+  phone?: string | null
+  lastLoginAt?: string | null
 }
 
 export interface ChangePasswordRequest {
@@ -16,6 +19,7 @@ export interface ChangePasswordRequest {
 export interface UpdateProfileRequest {
   firstName: string
   lastName: string
+  phone?: string | null
 }
 
 export interface ResetPasswordWithTokenRequest {
@@ -24,15 +28,24 @@ export interface ResetPasswordWithTokenRequest {
   newPassword: string
 }
 
+function mapProfile(profile: UserProfile): CurrentUser {
+  return {
+    id: profile.id,
+    email: profile.email,
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    role: profile.role,
+    phone: profile.phone,
+    lastLoginAt: profile.lastLoginAt,
+  }
+}
+
 export function getCurrentUser() {
-  return apiFetch<CurrentUser>('/auth/me')
+  return getMyProfile().then(mapProfile)
 }
 
 export function updateProfile(data: UpdateProfileRequest) {
-  return apiFetch<CurrentUser>('/auth/profile', {
-    method: 'PUT',
-    body: JSON.stringify(data),
-  })
+  return updateMyProfile(data).then(mapProfile)
 }
 
 export async function changePassword(data: ChangePasswordRequest) {

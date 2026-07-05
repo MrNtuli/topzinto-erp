@@ -12,6 +12,13 @@ public class ErpWebApplicationFactory : WebApplicationFactory<Program>, IDisposa
     {
         builder.UseEnvironment("Testing");
 
+        builder.UseSetting("UseSqlite", "true");
+        builder.UseSetting("ConnectionStrings:DefaultConnection", $"Data Source={_dbPath}");
+        builder.UseSetting("Backup:Enabled", "false");
+        builder.UseSetting("Redis:Enabled", "false");
+        builder.UseSetting("Email:Enabled", "false");
+        builder.UseSetting("Email:SystemAlerts", "false");
+
         builder.ConfigureAppConfiguration((_, config) =>
         {
             config.AddInMemoryCollection(new Dictionary<string, string?>

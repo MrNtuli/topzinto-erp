@@ -1,5 +1,7 @@
 # TopZinto Enterprise Construction ERP (TE-ERP)
 
+[![CI](https://github.com/MrNtuli/topzinto-erp/actions/workflows/ci.yml/badge.svg)](https://github.com/MrNtuli/topzinto-erp/actions/workflows/ci.yml)
+
 Internal operations platform for **TopZinto CC**.
 
 ## Project Structure
@@ -24,6 +26,12 @@ Topzinto System/
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (optional — for PostgreSQL/MinIO; SQLite works without Docker)
 
 ## Quick Start
+
+**Fastest (any OS with Node):** from repo root, run `npm run dev:all` — launches the platform startup script below.
+
+**Windows:** `.\scripts\start-dev.ps1` — opens API + Web in two terminals and polls `/api/health`.
+
+**Linux/macOS:** `./scripts/start-dev.sh`
 
 ### 1. Start database
 
@@ -297,6 +305,43 @@ See [`docs/BLUEPRINT.md`](docs/BLUEPRINT.md) for the master plan and module buil
 - [x] **Director unlock** — `/admin/users` → Unlock button clears lockout immediately
 - [x] **Audit trail** — unlock actions logged
 
+### v2.31 — Production Security Polish
+- [x] **Swagger disabled in production** — OpenAPI/SwaggerUI only registered in Development
+- [x] **Login rate limiting** — 10 POST `/api/auth/login` attempts per minute per IP (HTTP 429)
+- [x] **CI badge** — GitHub Actions build status in README
+
+### v2.32 — Dev Experience & Remember Me
+- [x] **One-command dev startup** — `npm run dev:all` from repo root, or `.\scripts\start-dev.ps1` (Windows) / `./scripts/start-dev.sh` (Linux/macOS); opens API + Web in separate terminals with health-check hints
+- [x] **Remember me login** — checkbox sends `rememberMe` to API; JWT expires in **7 days** when checked, **8 hours** when unchecked
+- [x] **Session storage** — unchecked uses `sessionStorage` (cleared when browser closes); checked uses `localStorage` for persistence
+
+### v2.33 — Forgot Password Flow (Go-Live Ready)
+- [x] **Request reset** — `POST /api/auth/forgot-password` always returns generic success (no email enumeration)
+- [x] **Secure tokens** — ASP.NET Identity reset tokens (1-hour expiry); hashed server-side
+- [x] **Reset password** — `POST /api/auth/reset-password` with strong password validation
+- [x] **Rate limiting** — 5 forgot-password requests per minute per IP (HTTP 429)
+- [x] **Audit trail** — forgot/reset requests logged with IP and user agent
+- [x] **UI** — `/forgot-password` and `/reset-password?email=...&token=...` with loading/success/error states
+- [x] **Dev mode** — reset link returned in API response and logged when SMTP is disabled
+- [x] **Integration tests** — full forgot/reset flow, rate limit, and validation coverage
+
+### v2.34 — Change Password (Authenticated User)
+- [x] **API** — `POST /api/auth/change-password` (requires JWT; `currentPassword`, `newPassword`)
+- [x] **Validation** — verifies current password; enforces strong password policy (8+ chars, upper, lower, digit, special)
+- [x] **Audit trail** — password changes logged with IP and user agent
+- [x] **UI** — Settings → **Change Password** (current, new, confirm) with loading/success/error states
+- [x] **Integration tests** — success, wrong current password, and weak new password coverage
+- [ ] **Future** — invalidate other active sessions after password change (JWT stateless; planned refresh-token/session store)
+
+### v2.35 — My Profile (User Account Page)
+- [x] **API** — `GET /api/users/me` and `PATCH /api/users/me` (requires JWT)
+- [x] **Editable fields** — first name, last name, phone (email and role are read-only; admin-only changes)
+- [x] **Profile data** — returns email, role, and last login when available
+- [x] **Audit trail** — profile updates logged with IP and user agent
+- [x] **UI** — `/profile` page with loading/success/error states; link from top bar user menu
+- [x] **Settings** — password change remains in Settings; profile editing moved to My Profile
+- [x] **Integration tests** — get profile, update profile, email/role cannot be changed via API
+
 ---
 
 ## Production Deploy (Docker)
@@ -329,6 +374,8 @@ To test MinIO locally without Docker API:
 ---
 
 ## Troubleshooting — "I see nothing"
+
+**Most common cause:** only one server is running. You need **both** the API (port 5000) and the Web dev server (port 5173). Run `.\scripts\start-dev.ps1` to start both.
 
 1. **Start the API** (terminal 1):
    ```powershell

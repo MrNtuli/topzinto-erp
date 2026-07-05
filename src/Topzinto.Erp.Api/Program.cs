@@ -1,5 +1,7 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Topzinto.Erp.Application.DTOs.Auth;
@@ -12,28 +14,58 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers()
     .AddJsonOptions(o => o.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+
+if (builder.Environment.IsDevelopment())
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "TopZinto ERP API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
     {
-        Description = "JWT Authorization header using the Bearer scheme.",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer",
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "TopZinto ERP API", Version = "v1" });
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            new OpenApiSecurityScheme
+            Description = "JWT Authorization header using the Bearer scheme.",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer",
+        });
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" },
+                },
+                Array.Empty<string>()
             },
-            Array.Empty<string>()
-        },
+        });
     });
+}
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddPolicy("login", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }));
+
+    options.AddPolicy("forgot-password", context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                QueueLimit = 0,
+            }));
 });
 
 builder.Services.AddInfrastructure(builder.Configuration);
@@ -89,6 +121,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("Web");
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseMiddleware<Topzinto.Erp.Api.Middleware.ActiveUserMiddleware>();
 app.UseAuthorization();

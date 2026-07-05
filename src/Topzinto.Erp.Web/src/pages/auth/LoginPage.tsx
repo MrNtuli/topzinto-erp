@@ -34,8 +34,8 @@ export function LoginPage() {
     setError('')
     setLoading(true)
     try {
-      const res = await loginApi({ email, password })
-      login(res.user, res.accessToken)
+      const res = await loginApi({ email, password, rememberMe: remember })
+      login(res.user, res.accessToken, remember)
       navigate('/')
     } catch (err) {
       const msg = err instanceof Error ? err.message : ''

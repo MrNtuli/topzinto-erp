@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Topzinto.Erp.Application.DTOs.Auth;
 using Topzinto.Erp.Application.Interfaces;
 
@@ -21,6 +22,7 @@ public class AuthController : ControllerBase
 
     [HttpPost("login")]
     [AllowAnonymous]
+    [EnableRateLimiting("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct)
     {
         var result = await _authService.LoginAsync(request, ct);
@@ -81,6 +83,9 @@ public class AuthController : ControllerBase
     [Authorize]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(request.CurrentPassword) || string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { message = "Current password and new password are required." });
+
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         var (success, error) = await _authService.ChangePasswordAsync(userId, request, ct);
         if (!success)
@@ -129,12 +134,19 @@ public class AuthController : ControllerBase
 
     [HttpPost("forgot-password")]
     [AllowAnonymous]
+    [EnableRateLimiting("forgot-password")]
     public async Task<IActionResult> ForgotPassword(
         [FromBody] ForgotPasswordRequest request,
         [FromServices] IWebHostEnvironment env,
         CancellationToken ct)
     {
-        var result = await _authService.RequestPasswordResetAsync(request, env.IsDevelopment(), ct);
+        if (string.IsNullOrWhiteSpace(request.Email))
+            return Ok(new ForgotPasswordResponse(
+                "If an account exists with that email, reset instructions have been sent.",
+                null));
+
+        var includeDevLink = env.IsDevelopment() || env.EnvironmentName == "Testing";
+        var result = await _authService.RequestPasswordResetAsync(request, includeDevLink, ct);
 
         await _auditService.LogAsync(
             null,
@@ -154,6 +166,11 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(request.Email)
+            || string.IsNullOrWhiteSpace(request.Token)
+            || string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { message = "Email, token, and new password are required." });
+
         var (success, error) = await _authService.ResetPasswordWithTokenAsync(request, ct);
         if (!success)
             return BadRequest(new { message = error ?? "Unable to reset password." });
